@@ -285,5 +285,12 @@
     "title": "EmbodiedJev 具身决策工作台",
     "group": "应用与 Agent 工程",
     "summary": "MuJoCo 机械臂上的 Jev 决策：分层子目标、费用对照与实测边界。"
+  },
+  {
+    "directory": "41-open-annie-jev-avatar",
+    "slug": "41-open-annie-jev-avatar",
+    "title": "Jev 驱动数字人动作",
+    "group": "应用与 Agent 工程",
+    "summary": "open-annie 把表情手势交给 Jev：118ms 延迟、置信度门控与规则兜底。"
   }
 ]

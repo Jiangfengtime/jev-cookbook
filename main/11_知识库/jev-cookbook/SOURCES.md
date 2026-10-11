@@ -43,6 +43,7 @@
 | `38-wechat-jev27b-vl/` | [微信公众号「魔搭ModelScope社区」JEV-27B-VL 发布文](https://mp.weixin.qq.com/s/gmlnplgfMg_x0_C0UbPCmg)（整理收录，模型结构与跑分单列） | `文章快照 2026-10-09` | 8 |
 | `39-microsoft-decision-1/` | [Microsoft Command Line「Introducing Microsoft-Decision-1」](https://commandline.microsoft.com/microsoft-decision-1-model-foundry/)（发布文全译，含 3 段官方演示视频） | `文章快照 2026-10-10` | 5 |
 | `40-embodied-jev/` | [GitHub FBddcz/embodied-jev README](https://github.com/FBddcz/embodied-jev)（整理编译，重点 Jev 应用与实测） | `仓库快照 2026-10-10` | 6 |
+| `41-open-annie-jev-avatar/` | [微信公众号「AI for Frontend」Jev 驱动数字人动作解读](https://mp.weixin.qq.com/s/jbE13suqK7C8rnlBDqj6uQ)（整理收录，解读 rehan-remade/open-annie） | `文章快照 2026-10-10` | 1 |
 | `laya-model/` | [NandhaKishorM/laya](https://github.com/NandhaKishorM/laya) | `本地接口快照 2026-09-23；模型卡 2026-09-20` | 8 |
 
 ## 收录原则

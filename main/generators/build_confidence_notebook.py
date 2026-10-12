@@ -72,7 +72,8 @@ md("### 0.2 导入库并创建客户端\n\n"
 code('''import os
 import time
 import math
-from dotenv import find_dotenv, load_dotenv
+from pathlib import Path
+from dotenv import load_dotenv
 
 from typesafe_sdk import (
     Choice,                       # 选择题：从命名选项中选一个，返回 choice + probabilities + confidence
@@ -82,7 +83,9 @@ from typesafe_sdk import (
     TypeSafeAuthenticationError,  # 401 鉴权失败时抛出
 )
 
-load_dotenv(find_dotenv(usecwd=True) or "main/.env")
+_cwd = Path.cwd().resolve()
+REPO_ROOT = next((p for p in (_cwd, *_cwd.parents) if (p / ".git").exists()), _cwd)
+load_dotenv(REPO_ROOT / "main" / ".env")
 API_KEY = os.getenv("TYPESAFE_API_KEY", "")
 BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
 MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")

@@ -107,13 +107,16 @@ import time
 import math
 from datetime import datetime, timezone
 from importlib.metadata import version
-from dotenv import find_dotenv, load_dotenv
+from pathlib import Path
+from dotenv import load_dotenv
 from typesafe_sdk import (
     Choice, Score, Noul, NoulCriteria, TypeSafeClient,
     TypeSafeAuthenticationError, RetryPolicy,
 )
 
-load_dotenv(find_dotenv(usecwd=True) or "main/.env")
+_cwd = Path.cwd().resolve()
+REPO_ROOT = next((p for p in (_cwd, *_cwd.parents) if (p / ".git").exists()), _cwd)
+load_dotenv(REPO_ROOT / "main" / ".env")
 MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0")
 BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
 RUN_MODE = os.environ.get("JEV_RUN_MODE", "auto")

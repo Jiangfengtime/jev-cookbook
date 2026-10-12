@@ -14,8 +14,10 @@ TARGETS = [
     *ROOT.glob("03_架构模式/*.ipynb"),
     *ROOT.glob("04_实战指南/*.ipynb"),
 ]
-DOTENV_IMPORT = "from dotenv import find_dotenv, load_dotenv"
-DOTENV_LOAD = 'load_dotenv(find_dotenv(usecwd=True) or "main/.env")'
+DOTENV_IMPORT = "from pathlib import Path\nfrom dotenv import load_dotenv"
+DOTENV_LOAD = '''_cwd = Path.cwd().resolve()
+REPO_ROOT = next((p for p in (_cwd, *_cwd.parents) if (p / ".git").exists()), _cwd)
+load_dotenv(REPO_ROOT / "main" / ".env")'''
 
 
 def configure(source: str) -> str:

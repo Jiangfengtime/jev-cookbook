@@ -121,7 +121,8 @@ TypeSafe API；没有 Key 或返回 401 时使用内置的离线示例答案。�
 import statistics
 import time
 from pprint import pprint
-from dotenv import find_dotenv, load_dotenv
+from pathlib import Path
+from dotenv import load_dotenv
 
 from typesafe_sdk import (
     Choice,
@@ -131,7 +132,9 @@ from typesafe_sdk import (
     TypeSafeAuthenticationError,
 )
 
-load_dotenv(find_dotenv(usecwd=True) or "main/.env")
+_cwd = Path.cwd().resolve()
+REPO_ROOT = next((p for p in (_cwd, *_cwd.parents) if (p / ".git").exists()), _cwd)
+load_dotenv(REPO_ROOT / "main" / ".env")
 API_KEY = os.getenv("TYPESAFE_API_KEY", "")
 BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
 MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")

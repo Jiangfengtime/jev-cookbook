@@ -5,8 +5,9 @@ import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const gameRoot = join(root, 'games', 'gridloop');
 const output = join(root, 'showcase', 'jev-games', 'traces', 'snake-baseline-live.json');
-const envText = await readFile(join(gameRoot, '.env'), 'utf8');
-for (const line of envText.split(/\r?\n/)) { const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/); if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, ''); }
+for (const envPath of [join(gameRoot, '.env'), join(gameRoot, '../../../../../.env')]) {
+  try { const envText = await readFile(envPath, 'utf8'); for (const line of envText.split(/\r?\n/)) { const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/); if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, ''); } } catch {}
+}
 
 const grid = 20;
 let snake = [{x: 9, y: 10}, {x: 8, y: 10}, {x: 7, y: 10}];
@@ -19,7 +20,7 @@ const foods = [{x:14,y:10},{x:10,y:5},{x:3,y:15},{x:16,y:4}];
 function legalMoves() { return Object.entries(vector).filter(([,next]) => { if (next.x === -direction.x && next.y === -direction.y) return false; const head = {x:snake[0].x + next.x,y:snake[0].y + next.y}; return head.x >= 0 && head.x < grid && head.y >= 0 && head.y < grid && !snake.some(part => part.x === head.x && part.y === head.y); }).map(([name]) => name); }
 async function askJev(state) {
   const criteria = Object.fromEntries(state.legalMoves.map(move => [move, `Move the snake ${move}. Keep the head inside the board and approach the food.`]));
-  const response = await fetch('https://api.typesafe.ai/v1/systemone', {method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.TYPESAFE_API_KEY}`},body:JSON.stringify({state,model:'jev-latest',questions:{move:{type:'choice',instructions:'Choose exactly one next direction from legalMoves. Use only the current board state and do not assume any hidden history.',criteria}}})});
+  const response = await fetch('https://api.typesafe.ai/v1/systemone', {method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${process.env.TYPESAFE_API_KEY}`},body:JSON.stringify({state,model:process.env.TYPESAFE_DEFAULT_MODEL || 'jev-latest',questions:{move:{type:'choice',instructions:'Choose exactly one next direction from legalMoves. Use only the current board state and do not assume any hidden history.',criteria}}})});
   if (!response.ok) throw new Error(`TypeSafe ${response.status}`);
   return response.json();
 }

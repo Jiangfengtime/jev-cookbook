@@ -7,6 +7,8 @@ at the local `python -m laya.serve` loopback endpoint.
 """
 from __future__ import annotations
 
+import os
+
 from typing import Any
 
 from .base import AdapterError
@@ -29,7 +31,7 @@ PROVIDERS: dict[str, dict[str, Any]] = {
     # the exact label set. Not a verbalized model.
     "jev": {
         "base_url": "https://api.typesafe.ai",   # /v1/systemone is appended by adapter
-        "default_model": "jev-latest",
+        "default_model": os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest"),
         "price_in_per_m": 0.042,   # $0.042 per 1M input tokens
         "price_out_per_m": 0.0,    # output tokens are free
         "mode": "native",
@@ -37,7 +39,7 @@ PROVIDERS: dict[str, dict[str, Any]] = {
     },
     "typesafe": {  # alias kept for backward compatibility
         "base_url": "https://api.typesafe.ai",
-        "default_model": "jev-latest",
+        "default_model": os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest"),
         "price_in_per_m": 0.042,
         "price_out_per_m": 0.0,
         "mode": "native",

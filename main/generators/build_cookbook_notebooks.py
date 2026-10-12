@@ -115,12 +115,13 @@ TypeSafe API；没有 Key 或返回 401 时使用内置的离线示例答案。�
 
     md("## 0. 准备")
     md("### 0.1 安装依赖")
-    code("%pip install -q -U typesafe-sdk")
+    code("%pip install -q -U typesafe-sdk python-dotenv")
     md("### 0.2 创建客户端")
     code("""import os
 import statistics
 import time
 from pprint import pprint
+from dotenv import find_dotenv, load_dotenv
 
 from typesafe_sdk import (
     Choice,
@@ -130,9 +131,12 @@ from typesafe_sdk import (
     TypeSafeAuthenticationError,
 )
 
-API_KEY = os.environ.get("TYPESAFE_API_KEY", "")
-client = TypeSafeClient(api_key=API_KEY, model="jev-latest") if API_KEY else None
-print("客户端已创建：模型=jev-latest，Key=", "已配置" if API_KEY else "未配置（将使用离线示例）")
+load_dotenv(find_dotenv(usecwd=True) or "main/.env")
+API_KEY = os.getenv("TYPESAFE_API_KEY", "")
+BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
+MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")
+client = TypeSafeClient(api_key=API_KEY, model=MODEL, base_url=BASE_URL) if API_KEY else None
+print("客户端已创建：模型=", MODEL, "，Key=", "已配置" if API_KEY else "未配置（将使用离线示例）")
 """)
     md("### 0.3 离线响应与统一调用入口")
     code("""class _FakeAnswer:

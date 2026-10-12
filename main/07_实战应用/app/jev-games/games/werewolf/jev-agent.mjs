@@ -183,7 +183,7 @@ export async function decideForAgent(game, agentId, phase) {
     }
   } else if (game.mode !== 'offline' && hasApiKey()) {
     try {
-      const response = await callJev({ model: 'jev-latest', state: inputState, questions: questionFor(phase, game, agentId) });
+      const response = await callJev({ model: process.env.TYPESAFE_DEFAULT_MODEL || 'jev-latest', state: inputState, questions: questionFor(phase, game, agentId) });
       const parsed = parseResponse(phase, response.data, game, agentId);
       if (!parsed) throw new Error('Jev response did not contain a legal choice');
       result = parsed;

@@ -231,7 +231,7 @@ cells.append(code(
     "        ),\n"
     "        RunnerConfig(\n"
     "            name='jev', adapter='typesafe',\n"
-    "            model='jev-latest', key_env='TYPESAFE_API_KEY',\n"
+    "            model=os.getenv('TYPESAFE_DEFAULT_MODEL', 'jev-latest'), key_env='TYPESAFE_API_KEY',\n"
     "            price_in_per_m=0.042, price_out_per_m=0.0,\n"
     "            skip_if_done=True,\n"
     "        ),\n"

@@ -22,6 +22,8 @@ import sys
 import time
 from pathlib import Path
 
+from dotenv import find_dotenv, load_dotenv
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import sudoku_game as S
@@ -162,13 +164,18 @@ def main() -> int:
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     judge = None
     if args.judge == 'jev':
+        load_dotenv(find_dotenv(usecwd=True) or Path(__file__).resolve().parents[3] / ".env")
         key = os.environ.get('TYPESAFE_API_KEY')
         if not key:
             print('TYPESAFE_API_KEY 未设置 —— 无法使用真 Jev，退出')
             return 1
         import typesafe_sdk
 
-        client = typesafe_sdk.TypeSafeClient()
+        client = typesafe_sdk.TypeSafeClient(
+            api_key=key,
+            model=os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0"),
+            base_url=os.getenv("TYPESAFE_BASE_URL") or None,
+        )
         judge = jev_judge_factory(client)
         label = 'jev (real API)'
     else:

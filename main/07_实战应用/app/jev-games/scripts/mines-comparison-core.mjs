@@ -102,5 +102,5 @@ export function makeRequest(game, variant) {
     const frontier = covered.filter(i => neighbors(i).some(j => /^\d$/.test(game.visible[j]))).slice(0,12);
     for (const i of frontier) questions[`risk_${cellName(i)}`] = {type: 'noul', instructions: `Given visible clues, is ${cellName(i)} a mine?`};
   }
-  return {payload: {model: 'jev-latest', state, questions}, phase, kinds, targets};
+  return {payload: {model: process.env.TYPESAFE_DEFAULT_MODEL || 'jev-latest', state, questions}, phase, kinds, targets};
 }

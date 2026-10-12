@@ -15,6 +15,7 @@ Pricing:  $0.042 / 1M input tokens; output free
 from __future__ import annotations
 
 import json
+import os
 import time
 import urllib.error
 import urllib.request
@@ -119,7 +120,7 @@ class TypesafeAdapter:
         self,
         *,
         base_url: str = "https://api.typesafe.ai",
-        model: str = "jev-latest",
+        model: str | None = None,
         key: str = "",
         request_options: dict | None = None,
         timeout_s: float = 120.0,
@@ -130,7 +131,7 @@ class TypesafeAdapter:
         if not base_url:
             raise ValueError("base_url is required")
         self.base_url = base_url.rstrip("/")
-        self.model = model
+        self.model = model or os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")
         self.key = key
         self.request_options = dict(request_options or {})
         self.timeout_s = timeout_s
@@ -202,4 +203,4 @@ class TypesafeAdapter:
 DEFAULT_PRICE_IN = 0.042
 DEFAULT_PRICE_OUT = 0.0
 DEFAULT_BASE_URL = "https://api.typesafe.ai"
-DEFAULT_MODEL = "jev-latest"
+DEFAULT_MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")

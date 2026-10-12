@@ -1,5 +1,6 @@
 # 《TypeSafe 架构模式实验》运行依赖（要求 Python >= 3.10）
 typesafe-sdk>=0.7
+python-dotenv>=1.0
 jupyterlab>=4.0
 ipykernel>=6.0
 nbformat>=5.9

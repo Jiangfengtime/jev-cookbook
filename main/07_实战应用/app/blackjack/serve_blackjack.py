@@ -9,6 +9,7 @@ Then open http://127.0.0.1:8802
 from __future__ import annotations
 
 import argparse
+import os
 import json
 import re
 import sys
@@ -17,6 +18,8 @@ import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+from dotenv import find_dotenv, load_dotenv
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -132,7 +135,12 @@ def make_judge(kind: str):
         return local_judge
     import typesafe_sdk
 
-    client = typesafe_sdk.TypeSafeClient()
+    load_dotenv(find_dotenv(usecwd=True) or Path(__file__).resolve().parents[3] / ".env")
+    client = typesafe_sdk.TypeSafeClient(
+        api_key=os.getenv("TYPESAFE_API_KEY"),
+        model=os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0"),
+        base_url=os.getenv("TYPESAFE_BASE_URL") or None,
+    )
 
     def jev_judge(request: dict) -> dict:
         response = client.system_one(state=request['state'], questions=request['questions'])

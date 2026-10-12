@@ -65,7 +65,7 @@ async function askJev(state: unknown, questions: Record<string, unknown>): Promi
 	const response = await fetch("https://api.typesafe.ai/v1/systemone", {
 		method: "POST",
 		headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-		body: JSON.stringify({ model: "jev-latest", state, questions }),
+		body: JSON.stringify({ model: process.env.TYPESAFE_DEFAULT_MODEL ?? "jev-latest", state, questions }),
 	});
 	if (!response.ok) throw new Error(`Jev HTTP ${response.status}`);
 	return (await response.json()) as JevResponse;

@@ -97,8 +97,8 @@ class Chapter:
         self.md("## 0. 准备\n\n本节可折叠阅读，但独立运行时不能跳过。客户端、辅助对象和示例数据都在本文件中定义。")
         self.step("### 0.1 安装依赖\n\n推荐先运行 `setup_env.sh`。只有当前内核缺少 SDK 时，本格才安装依赖。",
                   '''import importlib.util
-if importlib.util.find_spec("typesafe_sdk") is None:
-    %pip install -q typesafe-sdk==0.7.0''',
+if importlib.util.find_spec("typesafe_sdk") is None or importlib.util.find_spec("dotenv") is None:
+    %pip install -q typesafe-sdk==0.7.0 python-dotenv''',
                   "安装包的名字是 typesafe-sdk，Python 导入名是 typesafe_sdk。安装成功不代表 API 已连通。")
         self.step("### 0.2 导入与配置\n\n默认模型固定版本，便于记录实验条件；可通过环境变量更换。不要从 Notebook 输入密钥。",
                   '''import os
@@ -107,20 +107,24 @@ import time
 import math
 from datetime import datetime, timezone
 from importlib.metadata import version
+from dotenv import find_dotenv, load_dotenv
 from typesafe_sdk import (
     Choice, Score, Noul, NoulCriteria, TypeSafeClient,
     TypeSafeAuthenticationError, RetryPolicy,
 )
 
-MODEL = os.environ.get("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0")
+load_dotenv(find_dotenv(usecwd=True) or "main/.env")
+MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0")
+BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
 RUN_MODE = os.environ.get("JEV_RUN_MODE", "auto")
-API_KEY = os.environ.get("TYPESAFE_API_KEY", "")
+API_KEY = os.getenv("TYPESAFE_API_KEY", "")
 if RUN_MODE not in {"live", "offline", "auto"}:
     raise ValueError("JEV_RUN_MODE 只能是 live、offline 或 auto")
 if RUN_MODE == "live" and not API_KEY:
     raise RuntimeError("JEV_RUN_MODE=live 需要真实密钥：请配置 TYPESAFE_API_KEY；仅学习可改用默认 auto（无密钥自动离线）")
 client = None if (RUN_MODE == "offline" or not API_KEY) else TypeSafeClient(
-    api_key=API_KEY, model=MODEL, timeout=30, retry=RetryPolicy(max_retries=0))
+    api_key=API_KEY, model=MODEL, base_url=BASE_URL,
+    timeout=30, retry=RetryPolicy(max_retries=0))
 mode_note = ("在线优先：本次会话调用真实模型" if client is not None else
              ("强制离线（JEV_RUN_MODE=offline）" if RUN_MODE == "offline" else
               "未检测到 TYPESAFE_API_KEY → 离线替身；配置密钥后重跑本格即切在线实测"))

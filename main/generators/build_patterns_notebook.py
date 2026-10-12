@@ -59,7 +59,7 @@ md("## 0. 准备")
 md("### 0.1 安装所需的库\n\n"
    "如果已经用 `./setup_env.sh` 创建过环境，本节通常显示“依赖已满足”；"
    "在其他环境里首次运行时会自动安装。")
-code("%pip install -q -U typesafe-sdk          # 本笔记本必需（要求 Python ≥ 3.10）\n"
+code("%pip install -q -U typesafe-sdk python-dotenv  # 本笔记本必需（要求 Python ≥ 3.10）\n"
      "# %pip install -q -U jupyterlab         # 如本机还没有 Jupyter，取消注释运行一次\n"
      "# %pip install -q -U nbformat nbclient  # 仅在需要重新生成/批量执行笔记本时安装")
 
@@ -69,6 +69,7 @@ md("### 0.2 导入库并创建客户端\n\n"
    "- Key 从环境变量 `TYPESAFE_API_KEY` 读取；临时调试也可以直接赋值给 `API_KEY`（不要提交）。")
 code('''import os
 import time
+from dotenv import find_dotenv, load_dotenv
 
 from typesafe_sdk import (
     Choice,                       # 选择题：从命名选项中选一个，返回 choice + probabilities + confidence
@@ -78,10 +79,13 @@ from typesafe_sdk import (
     TypeSafeAuthenticationError,  # 401 鉴权失败时抛出
 )
 
-API_KEY = os.environ.get("TYPESAFE_API_KEY", "")
+load_dotenv(find_dotenv(usecwd=True) or "main/.env")
+API_KEY = os.getenv("TYPESAFE_API_KEY", "")
+BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
+MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")
 # API_KEY = "apikey_..."   # ← 仅在临时调试时使用，注意不要提交到公开仓库
-
-client = TypeSafeClient(api_key=API_KEY, model="jev-latest")''')
+client = TypeSafeClient(api_key=API_KEY, model=MODEL, base_url=BASE_URL)
+''')
 
 md("### 0.3 连通性测试\n\n"
    "用一条最简单的是非题试连官方 API：Key 有效则提示通过；"

@@ -37,13 +37,17 @@ const mime = {
 };
 const games = new Map();
 
-try {
-  const envText = await readFile(join(root, '.env'), 'utf8');
-  for (const line of envText.split(/\r?\n/)) {
-    const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
-    if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
-  }
-} catch {}
+for (const envPath of [join(root, '.env'), join(root, '../../../../../.env')]) {
+  try {
+    const envText = await readFile(envPath, 'utf8');
+    for (const line of envText.split(/\r?\n/)) {
+      const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
+      if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
+    }
+  } catch {}
+}
+
+const jevModel = process.env.TYPESAFE_DEFAULT_MODEL || 'jev-latest';
 
 function send(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });

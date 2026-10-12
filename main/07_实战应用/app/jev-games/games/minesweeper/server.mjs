@@ -7,13 +7,17 @@ const root = fileURLToPath(new URL('.', import.meta.url));
 const preferredPort = Number(process.env.PORT || 4174);
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8' };
 
-try {
-  const envText = await readFile(join(root, '.env'), 'utf8');
-  for (const line of envText.split(/\r?\n/)) {
-    const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
-    if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
-  }
-} catch {}
+for (const envPath of [join(root, '.env'), join(root, '../../../../../.env')]) {
+  try {
+    const envText = await readFile(envPath, 'utf8');
+    for (const line of envText.split(/\r?\n/)) {
+      const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
+      if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
+    }
+  } catch {}
+}
+
+const jevModel = process.env.TYPESAFE_DEFAULT_MODEL || 'jev-latest';
 
 async function readBody(req) { let body = ''; for await (const chunk of req) body += chunk; return JSON.parse(body || '{}'); }
 function send(res, status, data) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); }
@@ -38,7 +42,7 @@ async function move(req, res) {
   }));
   const revealActions = actions.filter(action => action.startsWith('reveal_'));
   const riskQuestions = Object.fromEntries(revealActions.map(action => { const [, row, col] = action.split('_'); return [`mine_${row}_${col}`, { type: 'noul', instructions: `Is the Minesweeper cell at row ${row}, column ${col} a mine based only on the visible board and nearby numbered clues?`, criteria: { true: 'The visible clues support that this cell is a mine.', false: 'The visible clues support that this cell is safe to reveal.' } }]; }));
-  const payload = { state, model: 'jev-latest', questions: { action: { type: 'choice', instructions: 'Play Minesweeper. Choose exactly one action from the actions list. Prefer logically certain safe reveals. Flag only cells supported by nearby numbers. If no certain move exists, choose the reveal with the strongest evidence of being safe and avoid repeating recent actions.', criteria }, ...riskQuestions } };
+  const payload = { state, model: jevModel, questions: { action: { type: 'choice', instructions: 'Play Minesweeper. Choose exactly one action from the actions list. Prefer logically certain safe reveals. Flag only cells supported by nearby numbers. If no certain move exists, choose the reveal with the strongest evidence of being safe and avoid repeating recent actions.', criteria }, ...riskQuestions } };
   return callJev(payload, res);
 }
 const server = createServer(async (req, res) => {

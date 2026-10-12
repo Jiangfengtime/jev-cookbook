@@ -33,7 +33,10 @@ import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from dotenv import find_dotenv, load_dotenv
+
 HTML_PATH = Path(__file__).resolve().parent / "smart_home_playground.html"
+load_dotenv(find_dotenv(usecwd=True) or Path(__file__).resolve().parents[2] / ".env")
 
 JEV_HOST = "api.typesafe.ai"
 JEV_PATH = "/v1/systemone"
@@ -43,6 +46,7 @@ CHAT_PATH = "/v1/chat/completions"
 
 stepfun_key = os.environ.get("STEPFUN_API_KEY", "")  # platform.stepfun.com 获取，语音/拆分/问答需要
 jev_key = os.environ.get("TYPESAFE_API_KEY", "")
+jev_model = os.environ.get("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0")
 # 与官方 SDK 同名约定：指向自建/代理上游（默认官方端点），用于联调与离线测试
 jev_base = os.environ.get("TYPESAFE_BASE_URL", "https://api.typesafe.ai").rstrip("/")
 asr_model = os.environ.get("STEPFUN_ASR_MODEL", "stepaudio-2.5-asr")
@@ -104,6 +108,7 @@ class Handler(BaseHTTPRequestHandler):
         elif self.path == "/api/health":
             self._send_json({
                 "jev": bool(jev_key),
+                "jev_model": jev_model,
                 "asr": bool(stepfun_key),
                 "chat": bool(stepfun_key),
                 "asr_model": asr_model,
@@ -132,6 +137,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json({"ok": False, "status": 0,
                              "error": "未设置 TYPESAFE_API_KEY，服务端以模拟模式运行"}, 503)
             return
+        payload.setdefault("model", jev_model)
         body = json.dumps(payload, ensure_ascii=False).encode()
         req = urllib.request.Request(
             f"{jev_base}{JEV_PATH}", data=body, method="POST",

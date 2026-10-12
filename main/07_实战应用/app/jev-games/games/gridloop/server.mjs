@@ -8,13 +8,17 @@ const preferredPort = Number(process.env.PORT || 4173);
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8' };
 
 // Load a local .env file without adding a runtime dependency.
-try {
-  const envText = await readFile(join(root, '.env'), 'utf8');
-  for (const line of envText.split(/\r?\n/)) {
-    const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
-    if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
-  }
-} catch {}
+for (const envPath of [join(root, '.env'), join(root, '../../../../../.env')]) {
+  try {
+    const envText = await readFile(envPath, 'utf8');
+    for (const line of envText.split(/\r?\n/)) {
+      const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
+      if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
+    }
+  } catch {}
+}
+
+const jevModel = process.env.TYPESAFE_DEFAULT_MODEL || 'jev-latest';
 
 async function readBody(req) { let body = ''; for await (const chunk of req) body += chunk; return JSON.parse(body || '{}'); }
 async function callJev(payload, res) {
@@ -28,7 +32,7 @@ async function callJev(payload, res) {
 }
 async function coach(req, res) {
   const state = await readBody(req);
-  const payload = { state, model: 'jev-latest', questions: { pace: { type: 'choice', instructions: 'Given this current Snake game state, what pace advice should the player follow next?', criteria: { calm: 'The player is early in the game or the board position needs safer space. Recommend a careful pace.', steady: 'The player has a stable position and should maintain a balanced pace with two-step planning.', sprint: 'The player has enough length or momentum to safely move faster toward the food.' } } } };
+  const payload = { state, model: jevModel, questions: { pace: { type: 'choice', instructions: 'Given this current Snake game state, what pace advice should the player follow next?', criteria: { calm: 'The player is early in the game or the board position needs safer space. Recommend a careful pace.', steady: 'The player has a stable position and should maintain a balanced pace with two-step planning.', sprint: 'The player has enough length or momentum to safely move faster toward the food.' } } } };
   return callJev(payload, res);
 }
 async function move(req, res) {
@@ -37,7 +41,7 @@ async function move(req, res) {
   const planned = state.plannedDirection || legal[0];
   const criteria = Object.fromEntries(legal.map(move => [move, move === planned ? `Move ${move}. This is the safest known route toward the food.` : `Move ${move} only if it clearly avoids a loop or collision.`]));
   const loopNote = state.loopDetected ? ` The recent path is looping. Break the loop now; prefer plannedDirection (${planned}) unless it causes immediate danger.` : '';
-  const payload = { state, model: 'jev-latest', questions: { move: { type: 'choice', instructions: `Choose the single next direction for the snake. Only choose a direction from legalMoves. Preserve survival, avoid repeating recentHeads, and move toward the food.${loopNote}`, criteria }, trap: { type: 'noul', instructions: 'Is the snake currently in a dangerous local situation where the obvious food-seeking move is likely to create a collision or repeated loop?', criteria: { true: 'The current position is risky or repetitive and needs a safer route.', false: 'The current position has a clear safe continuation.' } } } };
+  const payload = { state, model: jevModel, questions: { move: { type: 'choice', instructions: `Choose the single next direction for the snake. Only choose a direction from legalMoves. Preserve survival, avoid repeating recentHeads, and move toward the food.${loopNote}`, criteria }, trap: { type: 'noul', instructions: 'Is the snake currently in a dangerous local situation where the obvious food-seeking move is likely to create a collision or repeated loop?', criteria: { true: 'The current position is risky or repetitive and needs a safer route.', false: 'The current position has a clear safe continuation.' } } } };
   return callJev(payload, res);
 }
 function send(res, status, data) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(data)); }

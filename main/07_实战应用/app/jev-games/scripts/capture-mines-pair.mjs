@@ -10,11 +10,16 @@ const targetOutput = process.argv[5];
 const resume = mode === 'shaped' ? JSON.parse(await readFile(pathToFileURL(targetOutput), 'utf8')) : null;
 const board = resume?.board || makeBoard(seed);
 const initial = initialGame(board);
-let apiKey = process.env.TYPESAFE_API_KEY;
-if (!apiKey) {
-  const env = await readFile(new URL('games/minesweeper/.env', root), 'utf8');
-  apiKey = env.match(/^\s*TYPESAFE_API_KEY\s*=\s*(.*?)\s*$/m)?.[1].replace(/^['"]|['"]$/g, '');
+for (const envUrl of [new URL('games/minesweeper/.env', root), new URL('../../../.env', root)]) {
+  try {
+    const env = await readFile(envUrl, 'utf8');
+    for (const line of env.split(/\r?\n/)) {
+      const match = line.match(/^\s*([A-Z_][A-Z0-9_]*)\s*=\s*(.*?)\s*$/);
+      if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^['\"]|['\"]$/g, '');
+    }
+  } catch {}
 }
+const apiKey = process.env.TYPESAFE_API_KEY;
 if (!apiKey) throw Error('Missing TYPESAFE_API_KEY');
 const result = resume || {schemaVersion: 2, capturedAt: new Date().toISOString(), board, opening: {kind: 'reveal', cell: 0, actor: 'program', initial}, maxSteps, baseline: {events: []}, shaped: {events: []}};
 const destination = targetOutput ? pathToFileURL(targetOutput) : new URL('showcase/jev-games/traces/minesweeper-pair.json', root);
@@ -45,7 +50,7 @@ function baselineRequest(game) {
   const covered = game.visible.flatMap((v,i) => v === '#' ? [i] : []);
   const state = {size:14, totalMines:20, board:Array.from({length:14},(_,r)=>game.visible.slice(r*14,(r+1)*14)), covered, actions:covered.map(i=>`reveal_${Math.floor(i/14)}_${i%14}`), moves:game.moves};
   const criteria = Object.fromEntries(covered.map(cell => [cellName(cell), 'Reveal this covered cell using only the visible board.']));
-  return {payload:{model:'jev-latest',state,questions:{action:{type:'choice',instructions:'Choose one covered cell to reveal using only the currently visible board. Do not assume hidden history or hidden mine locations.',criteria}}},phase:'baseline',kinds:['reveal'],targets:covered};
+  return {payload:{model:process.env.TYPESAFE_DEFAULT_MODEL || 'jev-latest',state,questions:{action:{type:'choice',instructions:'Choose one covered cell to reveal using only the currently visible board. Do not assume hidden history or hidden mine locations.',criteria}}},phase:'baseline',kinds:['reveal'],targets:covered};
 }
 if (mode === 'baseline') await run('baseline'); else if (mode === 'shaped') await run('shaped'); else await Promise.all([run('baseline'),run('shaped')]);
 await save();

@@ -101,23 +101,20 @@ if importlib.util.find_spec("typesafe_sdk") is None or importlib.util.find_spec(
     %pip install -q typesafe-sdk==0.7.0 python-dotenv''',
                   "安装包的名字是 typesafe-sdk，Python 导入名是 typesafe_sdk。安装成功不代表 API 已连通。")
         self.step("### 0.2 导入与配置\n\n默认模型固定版本，便于记录实验条件；可通过环境变量更换。不要从 Notebook 输入密钥。",
-                  '''import os
-import json
-import time
-import math
+                  '''import os, json, time, math
 from datetime import datetime, timezone
 from importlib.metadata import version
 from pathlib import Path
-from dotenv import load_dotenv
-from typesafe_sdk import (
-    Choice, Score, Noul, NoulCriteria, TypeSafeClient,
-    TypeSafeAuthenticationError, RetryPolicy,
-)
+from dotenv import dotenv_values, load_dotenv
+from typesafe_sdk import Choice, Score, Noul, NoulCriteria, TypeSafeClient, TypeSafeAuthenticationError, RetryPolicy
 
 _cwd = Path.cwd().resolve()
 REPO_ROOT = next((p for p in (_cwd, *_cwd.parents) if (p / ".git").exists()), _cwd)
-load_dotenv(REPO_ROOT / "main" / ".env")
-MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0")
+ENV_FILE = REPO_ROOT / "main" / ".env"
+ENV_CONFIG = dotenv_values(ENV_FILE)
+load_dotenv(ENV_FILE)
+MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"
+MODEL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") else ("进程环境" if os.getenv("TYPESAFE_DEFAULT_MODEL") else "默认值")
 BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
 RUN_MODE = os.environ.get("JEV_RUN_MODE", "auto")
 API_KEY = os.getenv("TYPESAFE_API_KEY", "")
@@ -131,7 +128,7 @@ client = None if (RUN_MODE == "offline" or not API_KEY) else TypeSafeClient(
 mode_note = ("在线优先：本次会话调用真实模型" if client is not None else
              ("强制离线（JEV_RUN_MODE=offline）" if RUN_MODE == "offline" else
               "未检测到 TYPESAFE_API_KEY → 离线替身；配置密钥后重跑本格即切在线实测"))
-print("模式：", RUN_MODE, "｜", mode_note, "｜SDK：", version("typesafe-sdk"), "｜模型配置：", MODEL)''')
+print("模式：", RUN_MODE, "｜", mode_note, "｜SDK：", version("typesafe-sdk"), "｜模型配置：", MODEL, "｜模型来源：", MODEL_SOURCE)''')
         self.md("默认在线优先：有密钥即走真实模型，每次调用的来源（live/offline）都记录在 `CALL_LOG` 与输出中；`auto` 仅在未配置密钥或 401 时回退离线替身。正式验收设 `JEV_RUN_MODE=live`（禁用回退、不自动重试，请求数量有界）。")
         self.step("### 0.3 连通性测试\n\n用一条 Noul 检查真实响应能否返回。网络、限流与输入错误直接抛出，不伪装成不确定判断。",
                   '''PING = {"source": "offline", "reason": "未发起连通性请求（无 client：未配置密钥或强制离线）"}

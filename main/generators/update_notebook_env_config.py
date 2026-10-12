@@ -14,10 +14,14 @@ TARGETS = [
     *ROOT.glob("03_架构模式/*.ipynb"),
     *ROOT.glob("04_实战指南/*.ipynb"),
 ]
-DOTENV_IMPORT = "from pathlib import Path\nfrom dotenv import load_dotenv"
+DOTENV_IMPORT = "from pathlib import Path\nfrom dotenv import dotenv_values, load_dotenv"
 DOTENV_LOAD = '''_cwd = Path.cwd().resolve()
 REPO_ROOT = next((p for p in (_cwd, *_cwd.parents) if (p / ".git").exists()), _cwd)
-load_dotenv(REPO_ROOT / "main" / ".env")'''
+ENV_FILE = REPO_ROOT / "main" / ".env"
+ENV_CONFIG = dotenv_values(ENV_FILE)
+load_dotenv(ENV_FILE)
+MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"
+MODEL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") else ("进程环境" if os.getenv("TYPESAFE_DEFAULT_MODEL") else "默认值")'''
 
 
 def configure(source: str) -> str:
@@ -31,7 +35,6 @@ def configure(source: str) -> str:
         lines[start:end] = [
             DOTENV_LOAD,
             'BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None',
-            'MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-1.13.0")',
         ]
         lines = [line for line in lines if not line.startswith("# 从项目 main/.env")]
         source = "\n".join(lines)
@@ -55,13 +58,13 @@ def configure(source: str) -> str:
     source = re.sub(r'BASE_URL = os\.(?:environ\.get|getenv)\("TYPESAFE_BASE_URL"[^\n]*',
                     'BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None', source)
     source = re.sub(r'MODEL = os\.(?:environ\.get|getenv)\("TYPESAFE_DEFAULT_MODEL",',
-                    'MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL",', source)
+                    'MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or', source)
     if not re.search(r"^BASE_URL\s*=", source, re.MULTILINE):
         source = source.replace(DOTENV_LOAD, DOTENV_LOAD +
                                 '\nBASE_URL = os.getenv("TYPESAFE_BASE_URL") or None', 1)
     if not re.search(r"^MODEL\s*=", source, re.MULTILINE):
         source = source.replace(DOTENV_LOAD, DOTENV_LOAD +
-                                '\nMODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")', 1)
+                                '\nMODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"', 1)
 
     source = re.sub(r'model="(?:jev-latest|jev-1\.13\.0)"', "model=MODEL", source)
     source = re.sub(r'(api_key=API_KEY,\s*model=MODEL,)(?!\s*base_url=)',

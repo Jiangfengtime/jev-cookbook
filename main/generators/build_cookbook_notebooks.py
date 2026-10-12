@@ -122,7 +122,7 @@ import statistics
 import time
 from pprint import pprint
 from pathlib import Path
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 
 from typesafe_sdk import (
     Choice,
@@ -134,12 +134,15 @@ from typesafe_sdk import (
 
 _cwd = Path.cwd().resolve()
 REPO_ROOT = next((p for p in (_cwd, *_cwd.parents) if (p / ".git").exists()), _cwd)
-load_dotenv(REPO_ROOT / "main" / ".env")
+ENV_FILE = REPO_ROOT / "main" / ".env"
+ENV_CONFIG = dotenv_values(ENV_FILE)
+load_dotenv(ENV_FILE)
+MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"
+MODEL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") else ("进程环境" if os.getenv("TYPESAFE_DEFAULT_MODEL") else "默认值")
 API_KEY = os.getenv("TYPESAFE_API_KEY", "")
 BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None
-MODEL = os.getenv("TYPESAFE_DEFAULT_MODEL", "jev-latest")
 client = TypeSafeClient(api_key=API_KEY, model=MODEL, base_url=BASE_URL) if API_KEY else None
-print("客户端已创建：模型=", MODEL, "，Key=", "已配置" if API_KEY else "未配置（将使用离线示例）")
+print("客户端已创建：模型=", MODEL, "，Key=", "已配置" if API_KEY else "未配置（将使用离线示例）", "｜模型来源：", MODEL_SOURCE)
 """)
     md("### 0.3 离线响应与统一调用入口")
     code("""class _FakeAnswer:

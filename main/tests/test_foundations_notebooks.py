@@ -48,7 +48,8 @@ def execute_with_transport(slug):
                                   "seconds": None, "input_tokens": 0, "output_tokens": 0})
         return response
 
-    with patch.dict(os.environ, {"JEV_RUN_MODE": "offline", "TYPESAFE_API_KEY": ""}), contextlib.redirect_stdout(io.StringIO()):
+    with patch.dict(os.environ, {"JEV_RUN_MODE": "offline", "TYPESAFE_API_KEY": "",
+                                "TYPESAFE_BASE_URL": "http://127.0.0.1:8811"}), contextlib.redirect_stdout(io.StringIO()):
         for cell in nb.cells:
             if cell.cell_type != "code" or "%pip" in cell.source:
                 continue
@@ -66,6 +67,7 @@ class NotebookContracts(unittest.TestCase):
                 scope, requests = execute_with_transport(slug)
                 total += len(requests)
                 self.assertGreater(len(requests), 0)
+                self.assertEqual(scope["BASE_URL"], scope["ENV_CONFIG"].get("TYPESAFE_BASE_URL"))
                 self.assertEqual(scope["AUDIT"]["real_calls"], 0)
                 if slug == "build_with_typesafe":
                     self.assertEqual(scope["COVERAGE"]["missing"], [])

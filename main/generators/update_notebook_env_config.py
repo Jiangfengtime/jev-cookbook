@@ -21,7 +21,9 @@ ENV_FILE = REPO_ROOT / "main" / ".env"
 ENV_CONFIG = dotenv_values(ENV_FILE)
 load_dotenv(ENV_FILE)
 MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"
-MODEL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") else ("进程环境" if os.getenv("TYPESAFE_DEFAULT_MODEL") else "默认值")'''
+MODEL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") else ("进程环境" if os.getenv("TYPESAFE_DEFAULT_MODEL") else "默认值")
+BASE_URL = ENV_CONFIG.get("TYPESAFE_BASE_URL") or os.getenv("TYPESAFE_BASE_URL") or None
+BASE_URL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_BASE_URL") else ("进程环境" if os.getenv("TYPESAFE_BASE_URL") else "SDK 默认地址")'''
 
 
 def configure(source: str) -> str:
@@ -31,11 +33,12 @@ def configure(source: str) -> str:
     lines = source.splitlines()
     if "_cwd = Path.cwd().resolve()" in source:
         start = next(i for i, line in enumerate(lines) if line.startswith("_cwd ="))
-        end = next(i for i, line in enumerate(lines) if line.startswith("RUN_MODE ="))
-        lines[start:end] = [
-            DOTENV_LOAD,
-            'BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None',
-        ]
+        end = next((i for i, line in enumerate(lines) if line.startswith("RUN_MODE =")), None)
+        if end is None:
+            end = next(i for i, line in enumerate(lines) if line.startswith("API_KEY ="))
+            lines[start:end + 1] = [DOTENV_LOAD, 'API_KEY = os.getenv("TYPESAFE_API_KEY", "")']
+        else:
+            lines[start:end] = [DOTENV_LOAD]
         lines = [line for line in lines if not line.startswith("# 从项目 main/.env")]
         source = "\n".join(lines)
         source = source.replace('print("配置文件：", ENV_FILE or "未找到", "｜模式：", RUN_MODE,',
@@ -43,8 +46,21 @@ def configure(source: str) -> str:
         if "Path(" not in source:
             source = source.replace("from pathlib import Path\n", "")
 
-    if DOTENV_IMPORT not in source:
-        source = source.replace("import os\n", f"import os\n{DOTENV_IMPORT}\n", 1)
+    if "from pathlib import Path" not in source:
+        source = source.replace("import os\n", "import os\nfrom pathlib import Path\n", 1)
+    if "from dotenv import dotenv_values, load_dotenv" not in source:
+        source = source.replace("import os\n", "import os\nfrom dotenv import dotenv_values, load_dotenv\n", 1)
+    source_lines = source.splitlines()
+    seen_imports = set()
+    deduped_lines = []
+    for line in source_lines:
+        if line in {"from pathlib import Path", "from dotenv import dotenv_values, load_dotenv"}:
+            if line in seen_imports:
+                continue
+            seen_imports.add(line)
+        deduped_lines.append(line)
+    source = "\n".join(deduped_lines)
+    source = source.replace("import json\nimport time\nimport math", "import json, time, math")
     if DOTENV_LOAD not in source:
         lines = source.splitlines()
         start = next((i for i, line in enumerate(lines)
@@ -56,12 +72,11 @@ def configure(source: str) -> str:
     source = re.sub(r'API_KEY = os\.(?:environ\.get|getenv)\("TYPESAFE_API_KEY", ""\)',
                     'API_KEY = os.getenv("TYPESAFE_API_KEY", "")', source)
     source = re.sub(r'BASE_URL = os\.(?:environ\.get|getenv)\("TYPESAFE_BASE_URL"[^\n]*',
-                    'BASE_URL = os.getenv("TYPESAFE_BASE_URL") or None', source)
+                    'BASE_URL = ENV_CONFIG.get("TYPESAFE_BASE_URL") or os.getenv("TYPESAFE_BASE_URL") or None', source)
     source = re.sub(r'MODEL = os\.(?:environ\.get|getenv)\("TYPESAFE_DEFAULT_MODEL",',
                     'MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or', source)
     if not re.search(r"^BASE_URL\s*=", source, re.MULTILINE):
-        source = source.replace(DOTENV_LOAD, DOTENV_LOAD +
-                                '\nBASE_URL = os.getenv("TYPESAFE_BASE_URL") or None', 1)
+        source = source.replace(DOTENV_LOAD, DOTENV_LOAD, 1)
     if not re.search(r"^MODEL\s*=", source, re.MULTILINE):
         source = source.replace(DOTENV_LOAD, DOTENV_LOAD +
                                 '\nMODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"', 1)
@@ -73,6 +88,8 @@ def configure(source: str) -> str:
                     r'\1, base_url=BASE_URL\2', source)
     source = source.replace('print("客户端已创建：模型=jev-latest，Key=",',
                             'print("客户端已创建：模型=", MODEL, "，Key=",')
+    if "BASE_URL_SOURCE" in source and 'print("连接服务：", BASE_URL or "SDK 默认地址"' not in source:
+        source += '\nprint("连接服务：", BASE_URL or "SDK 默认地址", "｜地址来源：", BASE_URL_SOURCE)'
     return source
 
 

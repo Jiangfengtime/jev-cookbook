@@ -139,7 +139,7 @@ ENV_CONFIG = dotenv_values(ENV_FILE)
 load_dotenv(ENV_FILE)
 MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"
 MODEL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") else ("进程环境" if os.getenv("TYPESAFE_DEFAULT_MODEL") else "默认值")
-API_KEY = os.getenv("TYPESAFE_API_KEY", "")
+API_KEY = ENV_CONFIG.get("TYPESAFE_API_KEY") or os.getenv("TYPESAFE_API_KEY", "")
 BASE_URL = ENV_CONFIG.get("TYPESAFE_BASE_URL") or os.getenv("TYPESAFE_BASE_URL") or None
 BASE_URL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_BASE_URL") else ("进程环境" if os.getenv("TYPESAFE_BASE_URL") else "SDK 默认地址")
 client = TypeSafeClient(api_key=API_KEY, model=MODEL, base_url=BASE_URL) if API_KEY else None

@@ -36,7 +36,7 @@ def configure(source: str) -> str:
         end = next((i for i, line in enumerate(lines) if line.startswith("RUN_MODE =")), None)
         if end is None:
             end = next(i for i, line in enumerate(lines) if line.startswith("API_KEY ="))
-            lines[start:end + 1] = [DOTENV_LOAD, 'API_KEY = os.getenv("TYPESAFE_API_KEY", "")']
+            lines[start:end + 1] = [DOTENV_LOAD, 'API_KEY = ENV_CONFIG.get("TYPESAFE_API_KEY") or os.getenv("TYPESAFE_API_KEY", "")']
         else:
             lines[start:end] = [DOTENV_LOAD]
         lines = [line for line in lines if not line.startswith("# 从项目 main/.env")]
@@ -50,11 +50,13 @@ def configure(source: str) -> str:
         source = source.replace("import os\n", "import os\nfrom pathlib import Path\n", 1)
     if "from dotenv import dotenv_values, load_dotenv" not in source:
         source = source.replace("import os\n", "import os\nfrom dotenv import dotenv_values, load_dotenv\n", 1)
+    source = re.sub(r'API_KEY = os\.(?:environ\.get|getenv)\("TYPESAFE_API_KEY", ""\)',
+                    'API_KEY = ENV_CONFIG.get("TYPESAFE_API_KEY") or os.getenv("TYPESAFE_API_KEY", "")', source)
     source_lines = source.splitlines()
     seen_imports = set()
     deduped_lines = []
     for line in source_lines:
-        if line in {"from pathlib import Path", "from dotenv import dotenv_values, load_dotenv"}:
+        if line in {"from pathlib import Path", "from dotenv import dotenv_values, load_dotenv"} or line.startswith("API_KEY ="):
             if line in seen_imports:
                 continue
             seen_imports.add(line)
@@ -69,8 +71,6 @@ def configure(source: str) -> str:
             lines.insert(start, DOTENV_LOAD)
             source = "\n".join(lines)
 
-    source = re.sub(r'API_KEY = os\.(?:environ\.get|getenv)\("TYPESAFE_API_KEY", ""\)',
-                    'API_KEY = os.getenv("TYPESAFE_API_KEY", "")', source)
     source = re.sub(r'BASE_URL = os\.(?:environ\.get|getenv)\("TYPESAFE_BASE_URL"[^\n]*',
                     'BASE_URL = ENV_CONFIG.get("TYPESAFE_BASE_URL") or os.getenv("TYPESAFE_BASE_URL") or None', source)
     source = re.sub(r'MODEL = os\.(?:environ\.get|getenv)\("TYPESAFE_DEFAULT_MODEL",',
@@ -90,6 +90,8 @@ def configure(source: str) -> str:
                             'print("客户端已创建：模型=", MODEL, "，Key=",')
     if "BASE_URL_SOURCE" in source and 'print("连接服务：", BASE_URL or "SDK 默认地址"' not in source:
         source += '\nprint("连接服务：", BASE_URL or "SDK 默认地址", "｜地址来源：", BASE_URL_SOURCE)'
+    source = source.replace('"｜地址来源：", BASE_URL_SOURCE)',
+                            '"｜地址来源：", BASE_URL_SOURCE, "｜Key来源：", "main/.env" if ENV_CONFIG.get("TYPESAFE_API_KEY") else "进程环境")')
     return source
 
 

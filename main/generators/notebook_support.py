@@ -116,8 +116,9 @@ load_dotenv(ENV_FILE)
 MODEL = ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") or os.getenv("TYPESAFE_DEFAULT_MODEL") or "jev-1.13.0"
 MODEL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_DEFAULT_MODEL") else ("进程环境" if os.getenv("TYPESAFE_DEFAULT_MODEL") else "默认值")
 BASE_URL = ENV_CONFIG.get("TYPESAFE_BASE_URL") or os.getenv("TYPESAFE_BASE_URL") or None
+BASE_URL_SOURCE = "main/.env" if ENV_CONFIG.get("TYPESAFE_BASE_URL") else ("进程环境" if os.getenv("TYPESAFE_BASE_URL") else "SDK 默认地址")
 RUN_MODE = os.environ.get("JEV_RUN_MODE", "auto")
-API_KEY = os.getenv("TYPESAFE_API_KEY", "")
+API_KEY = ENV_CONFIG.get("TYPESAFE_API_KEY") or os.getenv("TYPESAFE_API_KEY", "")
 if RUN_MODE not in {"live", "offline", "auto"}:
     raise ValueError("JEV_RUN_MODE 只能是 live、offline 或 auto")
 if RUN_MODE == "live" and not API_KEY:
@@ -129,7 +130,7 @@ mode_note = ("在线优先：本次会话调用真实模型" if client is not No
              ("强制离线（JEV_RUN_MODE=offline）" if RUN_MODE == "offline" else
               "未检测到 TYPESAFE_API_KEY → 离线替身；配置密钥后重跑本格即切在线实测"))
 print("模式：", RUN_MODE, "｜", mode_note, "｜SDK：", version("typesafe-sdk"), "｜模型配置：", MODEL, "｜模型来源：", MODEL_SOURCE)
-print("连接服务：", BASE_URL or "SDK 默认地址", "｜地址来源：", BASE_URL_SOURCE)''')
+print("连接服务：", BASE_URL or "SDK 默认地址", "｜地址来源：", BASE_URL_SOURCE, "｜Key来源：", "main/.env" if ENV_CONFIG.get("TYPESAFE_API_KEY") else "进程环境")''')
         self.md("默认在线优先：有密钥即走真实模型，每次调用的来源（live/offline）都记录在 `CALL_LOG` 与输出中；`auto` 仅在未配置密钥或 401 时回退离线替身。正式验收设 `JEV_RUN_MODE=live`（禁用回退、不自动重试，请求数量有界）。")
         self.step("### 0.3 连通性测试\n\n用一条 Noul 检查真实响应能否返回。网络、限流与输入错误直接抛出，不伪装成不确定判断。",
                   '''PING = {"source": "offline", "reason": "未发起连通性请求（无 client：未配置密钥或强制离线）"}

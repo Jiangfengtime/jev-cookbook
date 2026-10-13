@@ -16,6 +16,9 @@ import nbformat
 from typesafe_sdk import RetryPolicy, TypeSafeClient, TypeSafeAuthenticationError, TypeSafeError
 
 ROOT = Path(__file__).resolve().parents[1]
+FILE_CONFIG = {"TYPESAFE_API_KEY": "file-test-placeholder",
+               "TYPESAFE_BASE_URL": "https://file-config.example/compatible-mode",
+               "TYPESAFE_DEFAULT_MODEL": "decision-model-preview"}
 sys.path.insert(0, str(ROOT / "generators"))
 from build_foundations_notebooks import CHAPTERS
 from execute_foundations_notebooks import assert_no_key, structure_report
@@ -48,8 +51,10 @@ def execute_with_transport(slug):
                                   "seconds": None, "input_tokens": 0, "output_tokens": 0})
         return response
 
-    with patch.dict(os.environ, {"JEV_RUN_MODE": "offline", "TYPESAFE_API_KEY": "",
-                                "TYPESAFE_BASE_URL": "http://127.0.0.1:8811"}), contextlib.redirect_stdout(io.StringIO()):
+    with patch.dict(os.environ, {"JEV_RUN_MODE": "offline", "TYPESAFE_API_KEY": "stale-process-key",
+                                "TYPESAFE_BASE_URL": "http://127.0.0.1:8811"}), \
+            patch("dotenv.dotenv_values", return_value=FILE_CONFIG), \
+            patch("dotenv.load_dotenv", return_value=False), contextlib.redirect_stdout(io.StringIO()):
         for cell in nb.cells:
             if cell.cell_type != "code" or "%pip" in cell.source:
                 continue
@@ -60,6 +65,38 @@ def execute_with_transport(slug):
 
 
 class NotebookContracts(unittest.TestCase):
+    def test_live_ping_uses_file_key_with_stale_process_credentials(self):
+        notebook = nbformat.read(ROOT / f"{FILENAMES['system_one']}.ipynb", as_version=4)
+        config = next(c.source for c in notebook.cells if c.cell_type == "code" and "ENV_CONFIG =" in c.source)
+        ping = next(c.source for c in notebook.cells if c.cell_type == "code" and 'PING = {"source"' in c.source)
+        requests = []
+
+        def handler(request):
+            requests.append(request)
+            return httpx2.Response(200, json={"model": "decision-model-preview",
+                "answers": {"greeting": {"type": "noul", "noul": 0.9}},
+                "usage": {"input_tokens": 1, "output_tokens": 0}})
+
+        def mock_client(**kwargs):
+            return TypeSafeClient(**kwargs, transport=httpx2.MockTransport(handler))
+
+        scope = {}
+        with patch.dict(os.environ, {"JEV_RUN_MODE": "live", "TYPESAFE_API_KEY": "stale-process-key",
+                                    "TYPESAFE_BASE_URL": "http://127.0.0.1:8811"}), \
+                patch("dotenv.dotenv_values", return_value=FILE_CONFIG), \
+                patch("dotenv.load_dotenv", return_value=False), \
+                patch("typesafe_sdk.TypeSafeClient", side_effect=mock_client), \
+                contextlib.redirect_stdout(io.StringIO()):
+            exec(config, scope)
+            try:
+                exec(ping, scope)
+            finally:
+                scope["client"].close()
+        self.assertEqual(len(requests), 1)
+        self.assertEqual(requests[0].headers["Authorization"], "Bearer file-test-placeholder")
+        self.assertEqual(str(requests[0].url), FILE_CONFIG["TYPESAFE_BASE_URL"] + "/v1/systemone")
+        self.assertEqual(scope["PING"]["source"], "live")
+
     def test_all_chapters_pass_sdk_serialization_and_response_parsing(self):
         total = 0
         for slug, _ in CHAPTERS:
@@ -68,6 +105,7 @@ class NotebookContracts(unittest.TestCase):
                 total += len(requests)
                 self.assertGreater(len(requests), 0)
                 self.assertEqual(scope["BASE_URL"], scope["ENV_CONFIG"].get("TYPESAFE_BASE_URL"))
+                self.assertEqual(scope["API_KEY"], FILE_CONFIG["TYPESAFE_API_KEY"])
                 self.assertEqual(scope["AUDIT"]["real_calls"], 0)
                 if slug == "build_with_typesafe":
                     self.assertEqual(scope["COVERAGE"]["missing"], [])

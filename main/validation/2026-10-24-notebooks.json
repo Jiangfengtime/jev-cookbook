@@ -1,0 +1,538 @@
+{
+  "date": "2026-10-24",
+  "scope": "37 authored notebooks; excludes knowledge-base mirrors, generated validation previews, templates, checkpoints",
+  "summary": {
+    "notebooks": 37,
+    "syntax_passed": 37,
+    "completed": 34,
+    "blocked_prerequisite": 3,
+    "core_live_notebooks": 25,
+    "core_live_requests": 225,
+    "python_tests": 17,
+    "node_tests": 27
+  },
+  "conditions": {
+    "python": "main/.venv/bin/python (3.11)",
+    "sdk": "0.7.0",
+    "model": "decision-model-preview",
+    "stale_process_env_injected": true,
+    "dependency_install_cells": "Skipped during execution after dependencies were installed; no repeated package mutation.",
+    "pi_cli": "Separate temporary installation; set PI_EXE to an installed pi executable to reproduce.",
+    "jev_mem_revision": "7ab0c73c6d8f4f611ad252c1e6ba8083f8df0e44",
+    "jev_mem_root": "External project supplied through JEV_MEM_ROOT; not vendored into this repository.",
+    "executed_copies": "/private/tmp/jev-full-validation-20261024",
+    "original_notebook_outputs": "Preserved; passed execution copies written separately."
+  },
+  "benchmarks": [
+    {
+      "workspace": "jev-benchmark-bdp6iq3s",
+      "result_file": "runs/notebook-demo/real/jev/results.jsonl",
+      "records": 231,
+      "distinct_task_ids": 231,
+      "statuses": {
+        "ok": 231
+      },
+      "sha256": "0ea0a850bcfb8ec76441b82dcc817d6537c859bdb5a67d7385ed083c6fbff760"
+    },
+    {
+      "workspace": "jev-benchmark-zkzh3b4f",
+      "result_file": "runs/notebook-demo/real/jev/results.jsonl",
+      "records": 231,
+      "distinct_task_ids": 231,
+      "statuses": {
+        "ok": 231
+      },
+      "sha256": "84f1a9dae92e6cb73c52765842af1a099af50b2aeccc1a251329cf14dd526254"
+    },
+    {
+      "workspace": "jev-benchmark-pj92p6ug",
+      "result_file": "runs/notebook-demo/real/_tmp/cell12-jev/jev/results.jsonl",
+      "records": 231,
+      "distinct_task_ids": 231,
+      "statuses": {
+        "ok": 231
+      },
+      "sha256": "58440a644d6905cf40271ba4ab3af64a58a992736166296875971dc418808f3e"
+    },
+    {
+      "workspace": "jev-benchmark-pj92p6ug",
+      "result_file": "runs/notebook-demo/real/jev/results.jsonl",
+      "records": 231,
+      "distinct_task_ids": 231,
+      "statuses": {
+        "ok": 231
+      },
+      "sha256": "58440a644d6905cf40271ba4ab3af64a58a992736166296875971dc418808f3e"
+    }
+  ],
+  "memory_audits": [
+    {
+      "workspace": "jev_mem_walkthrough-1zj3fo_t",
+      "events": {
+        "jev_decision": 15,
+        "memory_constructed": 6,
+        "query": 2
+      },
+      "sha256": "889510996877e0c03b2db87627f128c90d7e00421de65ab6789e248deca8c034"
+    },
+    {
+      "workspace": "jev_mem_exp-aaomykns",
+      "events": {
+        "jev_decision": 49,
+        "memory_constructed": 16
+      },
+      "sha256": "f8e979e5353ff7245689d5bb98476183662a9738cc99e953a608deaad51b0341"
+    }
+  ],
+  "notebooks": [
+    {
+      "path": "main/01_认识Jev/01_认识Jev.ipynb",
+      "execution": "passed",
+      "source_sha256": "2430d8ee60624ae9bff02fd166f60d6b0712808839e78308d268a3766b9a2af5",
+      "executed_artifact_sha256": "212ebda19baa264a43e7791b6ceda6e0e06eb553da84bf212eb9d4893c36678e",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/02_核心概念/01_SystemOne.ipynb",
+      "execution": "passed",
+      "source_sha256": "cf98262286a4918f81ee32d017379943d79f3d8e0e949f184f70a5c69c3a4faf",
+      "executed_artifact_sha256": "ab39d1135d014309648a44cde8bb4c070cc14c7a5609ff75742e4c824ab764d0",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 3,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/02_核心概念/02_状态.ipynb",
+      "execution": "passed",
+      "source_sha256": "baad0349a834f0411ef1c5fc719d71d93377e1c1c462c94d1f89005c9db81cfb",
+      "executed_artifact_sha256": "2c3ceb13b8762974226cb999e1c1a64c70a2f9046a24953d7f4b551e44f210a5",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/02_核心概念/03_原语.ipynb",
+      "execution": "passed",
+      "source_sha256": "16ed23b91c5eb37e955466c6e64f52790f71f04aafe80da7ad98176355ee8448",
+      "executed_artifact_sha256": "9c093478ba994174a9cbf9616cada20c834d9209844cfaa26f9c05290e2c693b",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 27,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/02_核心概念/04_置信度.ipynb",
+      "execution": "passed",
+      "source_sha256": "4e5cae2f81510fb4da136bf77cd97bdf5a130024a56c12c9f40900e2cf600e8c",
+      "executed_artifact_sha256": "2d38a8beffc195c51e08d145f2e5fc636f674d112e21806f97d355b062a4cd63",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 24,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/02_核心概念/05_应用构建.ipynb",
+      "execution": "passed",
+      "source_sha256": "b57b81bd6813d92c347db2b7da58f64158e77c1f1e89770cb1433ad4449f1d9c",
+      "executed_artifact_sha256": "6b381cb66c6e3894bf6a6914c5dc7891ad02c8e2e4316148bd3d54c04498274d",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 13,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/03_架构模式/01_架构模式.ipynb",
+      "execution": "passed",
+      "source_sha256": "9cb0234119939b13f9925f04e2c370e6905d4a02120bd4297e1db049d25cab90",
+      "executed_artifact_sha256": "9dc1c0f03fed2c34435fa2d759dcd7586fa7ff012935b3d08054fc24021ac5e9",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 20,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/01_自一致性Noul.ipynb",
+      "execution": "passed",
+      "source_sha256": "1a41cf3260e1bee63bdd35bd22172da27456a04436811d3e0b513cdf243c6919",
+      "executed_artifact_sha256": "c0e254a71f01f39db9cf4ef9a9c6239d1433f87c8e5e67c26d5edc0cc770701c",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/02_自一致性Choice.ipynb",
+      "execution": "passed",
+      "source_sha256": "695b1b833d5b03dbe5d0104ae13cb29484c64143bc4c102b73e15d5a699a13bc",
+      "executed_artifact_sha256": "a7245e5f7c76ea7518f5b260d7363576d90564094de34bfa1c8999e2c324564c",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/03_并行提问.ipynb",
+      "execution": "passed",
+      "source_sha256": "55b3f8825182049ed6e627a6fb9b485a7231ec4e89ca96439017f59668c8df7f",
+      "executed_artifact_sha256": "e88438d91088e7a62342ef2d2b5be448d57f132111334147d8fa7d5958873834",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/04_重排序.ipynb",
+      "execution": "passed",
+      "source_sha256": "4705a348db227d2bf614c4da53a7a8770b678cd08f8b9c3586fa6bdc636acbd5",
+      "executed_artifact_sha256": "782cb48270620be5c14b75cfa974995b178af89641548c9e1575be3f91e24c45",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 5,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/05_逐行语义搜索.ipynb",
+      "execution": "passed",
+      "source_sha256": "7c270f4d917b271e11b957c7c9a179278ea87185c362922880b2de689af3a5c2",
+      "executed_artifact_sha256": "9e55a38b521faf3351ba9793bedf060ea5558089a598b87bdfc9b75cef31ec59",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 5,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/06_结构恢复.ipynb",
+      "execution": "passed",
+      "source_sha256": "8da9ac33f65a1f906b7236834dfe1d60e345145da199e68ea91e833d09fd3b0b",
+      "executed_artifact_sha256": "881910edadf3b7134b50692ba5a11dc48571340b030231a31d6e738784c3ed7f",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 5,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/07_函数调用.ipynb",
+      "execution": "passed",
+      "source_sha256": "00fd2dde445f78b0ad0d05c0a02d64a1e5bb303f669eac697d88589c861e8bdc",
+      "executed_artifact_sha256": "2a93cd197d36afb1b75802d987b82d62f8d8bcffd1b4a5ad80ee55de3fa7a0e8",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 2,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/08_技能推荐.ipynb",
+      "execution": "passed",
+      "source_sha256": "b5322ed032c89436af05ec16718fa6c31f301911898c64da65bc612e654cd918",
+      "executed_artifact_sha256": "497f9aa087677a131e0838aa1e21dc0435538e0989a78954ebe07c533cd1cc80",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/09_实体对齐.ipynb",
+      "execution": "passed",
+      "source_sha256": "82dbf024beb8b7047547d3c35d942c67d192b13bebf79f28b58ea5dbc70cac71",
+      "executed_artifact_sha256": "d394f3f1099c2b9fabca8fcb2aa248ac647a6d012121006b809579dd636392b6",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 5,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/10_RAG段落分类.ipynb",
+      "execution": "passed",
+      "source_sha256": "bc6d71c34be3adc5d722d74e21c0cb0ef303a4de8a49bdd7b0d083e244a55930",
+      "executed_artifact_sha256": "11ee2a842abf19e7b813f3e79e244e3dc0713963ca72b89a5495bf9620f8862b",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 7,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/11_引用核查.ipynb",
+      "execution": "passed",
+      "source_sha256": "1dc0bf0e44c6a31fe4e4b8b6f313721fc545f7517a5c289621437dbb50964142",
+      "executed_artifact_sha256": "418781b5786bc03fe33b107e429ed86a33b4584650f6f7e74d94643b256372d8",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 5,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/12_LLM防护栏.ipynb",
+      "execution": "passed",
+      "source_sha256": "abaafc1a0f75bc309cf0702f9f5867987bcfb1054fb11583278e84be106d394b",
+      "executed_artifact_sha256": "c0cdf8a14c5bf15b8454fc3b71f5255277b21e9a4a9ced49f27be6eed9613284",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 13,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/13_SDE级联.ipynb",
+      "execution": "passed",
+      "source_sha256": "3b001708acdac6c5459aaab1b86f3a09077321e3dd079a00cf1a16698dbe9a30",
+      "executed_artifact_sha256": "e9bb4ec053b6cc03d6bf3762bd3226ce38ec6b2c4a2319ce6ad6b093c4e89e7a",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 4,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/14_日期抽取.ipynb",
+      "execution": "passed",
+      "source_sha256": "88b193c552cd6053e1e53038dad0843fa75a1f900ab76462e333e64315ad46a9",
+      "executed_artifact_sha256": "96c8c3b9e55d401f83159887ed8f5cf305d5badfe39a671eeffbb4b7e7a32b13",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 5,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/15_预解析值抽取.ipynb",
+      "execution": "passed",
+      "source_sha256": "ca81268548ba71d8fc135f8b0637531919227f3766b67d811ab4e3e1d400b688",
+      "executed_artifact_sha256": "c5d013fb46e46bcaa9519e2c256b816a06a6249381eb4c0c0b73dfa9ef82d5e3",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 9,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/16_层级分类.ipynb",
+      "execution": "passed",
+      "source_sha256": "d8fe260600acbd23add77358eaa1f7241b998fa4b3391415efbc6f6f51f87067",
+      "executed_artifact_sha256": "794ff45e6f60ef58a8697448d7c520c44f166e00bfb8ddae871a9041ca937456",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 25,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/17_自动研究特征发现.ipynb",
+      "execution": "passed",
+      "source_sha256": "0b394a055c2bf52becfd5fc4f3730bfcc38a0e46503a89c9eca5ffb94bcbaa8b",
+      "executed_artifact_sha256": "54214fba15dc3b1e95b16b6a3556223858c209f4022c91df0405486e2a80050f",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/04_实战指南/18_基于置信度的分类.ipynb",
+      "execution": "passed",
+      "source_sha256": "f6a2c078a479bf55199ddb7cba21c0dd42a53630c8ec05670b920f94e6d110f3",
+      "executed_artifact_sha256": "fd25ec9ac9d24974db110461de7e923e4ae5f4eb38cdaceb83ada95877c7050b",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实接口从头执行，零离线回退。",
+      "requests": 6,
+      "models": [
+        "decision-model-preview"
+      ]
+    },
+    {
+      "path": "main/05_智能家居实验/01_智能家居实验.ipynb",
+      "execution": "passed",
+      "source_sha256": "a7de86b48f0046ac9c1b104f5949b60ec61a0ba25f29b4b942261272c4e73f04",
+      "executed_artifact_sha256": "0031d1e34b16d2d30984ba094e685fc7392c40fa39df4c087180a21ccfe2caab",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实 Jev 文本决策通过；未配置 StepFun，未验证语音与聊天。"
+    },
+    {
+      "path": "main/06_模型评测/01_模型评测.ipynb",
+      "execution": "passed",
+      "source_sha256": "1b87a1119a5a91cb6fe029f138e6cfaa552c5dd172aa4179166402870dc314f6",
+      "executed_artifact_sha256": "2a92c611ec3d0f2f74f1765701920739792ab9c25a768a8b1ebfdfd47c5e3727",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "配置的 Jev 服务完成 231 道不同题目，全部 ok；本地 Laya 服务未启动，未做双模型对比。",
+      "coverage_assertions": [
+        "BENCHMARK_COVERAGE jev {'ok': 231}"
+      ]
+    },
+    {
+      "path": "main/06_模型评测/benchmark/notebooks/laya_vs_jev.ipynb",
+      "execution": "passed",
+      "source_sha256": "3d7e9778d8a441a2157cd2597e4f49ee2edba45fcf6d0dcc1226b92b5095887f",
+      "executed_artifact_sha256": "59d6fc5b8a635cda2322e946f1e3f34970a75ba88343292e97f55d5913380e69",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "配置的 Jev 服务完成 231 道不同题目，全部 ok；本地 Laya 服务未启动，未做双模型对比。",
+      "coverage_assertions": [
+        "BENCHMARK_COVERAGE jev {'ok': 231}"
+      ]
+    },
+    {
+      "path": "main/06_模型评测/llm_eval/notebooks/jevbench_intro.ipynb",
+      "execution": "passed",
+      "source_sha256": "476ae1988e93bdd360b42bcf3b6a7b74e31b76100b840d0ebf6b85edf363a0f9",
+      "executed_artifact_sha256": "3f7ee87f99f62455625ca211b299de56eba4666dd0a25996cc121be4e241df39",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "配置的 Jev 服务完成 231 道不同题目，全部 ok；本地 Laya 服务未启动，未做双模型对比。",
+      "coverage_assertions": [
+        "BENCHMARK_COVERAGE jev {'ok': 231}",
+        "BENCHMARK_COVERAGE jev {'ok': 231}"
+      ]
+    },
+    {
+      "path": "main/07_实战应用/app/smart-home/smart_home_walkthrough.ipynb",
+      "execution": "passed",
+      "source_sha256": "56de2f97afcef0f5fe4549180390ba210d72e670106ccddb0dc3b14e9a462e3b",
+      "executed_artifact_sha256": "006deb6b6f404f098b00c984ee21af83683a76ee857dcdbfa4daec02c7b551f2",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实 Jev 文本决策通过；未配置 StepFun，未验证语音与聊天。"
+    },
+    {
+      "path": "main/08_前沿研究/jev_mem/jev_mem_scaling.ipynb",
+      "execution": "blocked_prerequisite",
+      "source_sha256": "51a54e8d75fd5a8050c65d8f993e5f2ae447d91699c007cc91f4b8150a1fcd29",
+      "executed_artifact_sha256": "13518721742a23ab7f0bc95afa544393922b9d6f9f89d05f99373fa69e731341",
+      "source_matches_executed_copy": true,
+      "errors": [
+        "缩放对比需要聊天模型 Key，请在 main/.env 配置 DEEPSEEK_API_KEY 或 OPENAI_API_KEY。"
+      ],
+      "notes": "缺少 DEEPSEEK_API_KEY / OPENAI_API_KEY；已修复路径、配置和分批逻辑，缩放实验未执行。"
+    },
+    {
+      "path": "main/08_前沿研究/jev_mem/jev_mem_walkthrough.ipynb",
+      "execution": "passed",
+      "source_sha256": "32984fda91859f2d00e49d49ce7b43f7227b77cf8233bcb7f8b6f7a0875f8d52",
+      "executed_artifact_sha256": "0b400950d1b5e934fa550db007cd7f922e2718447d7039b8f3b92c524cc88c54",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "真实 Jev 建图和检索通过，审计无决策兜底；没有聊天模型 Key，跳过答案生成及评审对比。"
+    },
+    {
+      "path": "main/09_Agent集成/01_Pi集成实验.ipynb",
+      "execution": "passed",
+      "source_sha256": "314edfdf12baf3ffa3d824beeba811666c7de631e50cb038a621266aafa65d4a",
+      "executed_artifact_sha256": "174f088fb4be8c4c595ee4ee8cdc17bb54ef441a4eb07c55217c97e4d4586c97",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "用单独安装的 Pi CLI 验证三个实时决策命令；不代表自由对话 Agent 完整会话已验证。"
+    },
+    {
+      "path": "main/09_Agent集成/02_DSH决策协作.ipynb",
+      "execution": "passed",
+      "source_sha256": "0c9f4469465b4c514fec3c195b666dd44474864750075c3a6c567153294cc7e8",
+      "executed_artifact_sha256": "5e6c03f04b676da262a9a5739816e6279b84d4d8f3a687f5c72049de397e3e50",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "原语与路由使用真实 Jev；对话案例按设计重放归档并运行测试，没有新跑对话模型。"
+    },
+    {
+      "path": "main/10_本地模型/notebooks/full_v2_finetuning.ipynb",
+      "execution": "blocked_prerequisite",
+      "source_sha256": "bdbb0e9c2a916ffaad5bd5419b65b9776965c9810ac57b2164b0acf085697049",
+      "executed_artifact_sha256": "73492a5f9c07f6b0c20457657d8b77e22be7609ec4262032c9cb6ea6929b6881",
+      "source_matches_executed_copy": true,
+      "errors": [
+        "当前微调实验需要 NVIDIA CUDA GPU；本机可运行数据构建和模型 API 教程，但不能执行此训练。"
+      ],
+      "notes": "本机无 CUDA GPU，前置检查明确停止；未下载训练权重或执行训练。"
+    },
+    {
+      "path": "main/10_本地模型/notebooks/zh_dataset_construction.ipynb",
+      "execution": "passed",
+      "source_sha256": "75f38fb5b4b7f740513b82e99f3028678a1d367c54cb8d70d1bb8cdc6cd142e7",
+      "executed_artifact_sha256": "935585e2ec0585343482750f4a860a18e63f15e0a5e27cab5010945f5ba0b29e",
+      "source_matches_executed_copy": true,
+      "errors": [],
+      "notes": "默认流程执行结束；原始 ShareGPT 数据缺失，API 生成和标注开关关闭，相关步骤明确跳过。"
+    },
+    {
+      "path": "main/10_本地模型/notebooks/zh_head_finetuning.ipynb",
+      "execution": "blocked_prerequisite",
+      "source_sha256": "c433c53d1fefbd9c8e513deefcd5e684ae2339d0de68efe13711a1f06d663d88",
+      "executed_artifact_sha256": "01ebd1bdab60da708d16ed091f1b912ba39c69dd5bcaa5b842b415bd902cc032",
+      "source_matches_executed_copy": true,
+      "errors": [
+        "当前微调实验需要 NVIDIA CUDA GPU；本机可运行数据构建和模型 API 教程，但不能执行此训练。"
+      ],
+      "notes": "本机无 CUDA GPU，前置检查明确停止；未下载训练权重或执行训练。"
+    }
+  ]
+}

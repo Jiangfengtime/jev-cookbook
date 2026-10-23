@@ -1,0 +1,10 @@
+# 扩展 Notebook 的图表、评测和 Jev-Mem 运行依赖。
+# CUDA 微调另用 10_本地模型/requirements.txt；Pi/DSH 还需要 Node.js。
+-r requirements.txt
+matplotlib>=3.8
+openai>=1.0
+scikit-learn>=1.3
+networkx>=3.0
+faiss-cpu>=1.7
+sentence-transformers>=2.2
+tiktoken>=0.5

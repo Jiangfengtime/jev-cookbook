@@ -4,15 +4,33 @@ import { JevClient, TYPESAFE_ENDPOINT } from '../dist/client.js';
 
 const originalFetch = globalThis.fetch;
 const originalKey = process.env.TYPESAFE_API_KEY;
+const originalBaseUrl = process.env.TYPESAFE_BASE_URL;
 afterEach(() => {
   globalThis.fetch = originalFetch;
   if (originalKey === undefined) delete process.env.TYPESAFE_API_KEY;
   else process.env.TYPESAFE_API_KEY = originalKey;
+  if (originalBaseUrl === undefined) delete process.env.TYPESAFE_BASE_URL;
+  else process.env.TYPESAFE_BASE_URL = originalBaseUrl;
 });
 const questions = { yes: { type: 'noul', instructions: '是否足够明确？' } };
 const payload = { model: 'jev-test-fixture', answers: { yes: { type: 'noul', noul: 0.93 } }, usage: { input_tokens: 12, output_tokens: 4 } };
 const live = () => new JevClient({ mode: 'live', model: 'jev-test', timeoutMs: 100 });
 function mockFetch(fn) { process.env.TYPESAFE_API_KEY = 'test-key-must-not-leak'; globalThis.fetch = fn; }
+
+test('自定义 System One 地址生效，保留阿里云返回的未知 output_tokens', async () => {
+  process.env.TYPESAFE_BASE_URL = 'https://configured.example/compatible-mode/';
+  mockFetch(async (url) => {
+    assert.equal(url, 'https://configured.example/compatible-mode/v1/systemone');
+    return Response.json({ ...payload, usage: { input_tokens: 12, output_tokens: null } });
+  });
+  const result = await live().decide('材料', questions);
+  assert.equal(result.status, 'ok');
+  assert.equal(result.usage.output_tokens, null);
+  mockFetch(async () => Response.json({ ...payload, usage: { input_tokens: 12 } }));
+  const missing = await live().decide('材料', questions);
+  assert.equal(missing.status, 'ok');
+  assert.equal(missing.usage.output_tokens, null);
+});
 
 test('缺少密钥和显式 mock 均不发出网络请求；live 不回退为 mock', async () => {
   delete process.env.TYPESAFE_API_KEY;

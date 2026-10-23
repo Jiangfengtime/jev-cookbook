@@ -36,7 +36,12 @@ Jev 的公开接口适合答案空间有限、需要结构化概率输出的判�
     ./setup_env.sh
     .venv/bin/python -m pip install -r requirements.txt -c generators/constraints-foundations.txt
 
-实时实验需要把 TYPESAFE_API_KEY 放在启动 Jupyter 的进程环境中。密钥不要写入 Notebook、配置文件或日志。实时 API 调用可能计费，并受服务端版本、网络和限额影响。
+实时实验从 `main/.env` 读取 `TYPESAFE_API_KEY`、`TYPESAFE_BASE_URL` 和 `TYPESAFE_DEFAULT_MODEL`；文件中明确设置的值优先于内核里残留的旧环境变量。`.env` 已被 Git 忽略，不要把密钥写入 Notebook、日志或提交到仓库。实时 API 调用可能计费，并受服务端版本、网络和限额影响。
+
+扩展实验另需安装 `requirements-extended.txt`，Pi/DSH 需要 Node.js，Jev-Mem 需要外部项目，训练需要 CUDA GPU。逐本结果、未满足的条件与复查命令见 [2026-10-24 全量验证报告](validation/2026-10-24-notebooks.md)。可以先从仓库根目录运行语法检查，再按需启用真实请求：
+
+    main/.venv/bin/python main/generators/validate_notebooks.py --scope all
+    main/.venv/bin/python main/generators/validate_notebooks.py --scope all --execute --output /tmp/jev-validation
 
 离线运行使用 Notebook 提供的示例响应，例如：
 

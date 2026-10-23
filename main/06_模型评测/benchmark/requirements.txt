@@ -19,4 +19,5 @@ matplotlib>=3.7
 # HTTP 测试 / mock
 requests>=2.31
 
-# 不再需要 openai / 其他 provider SDK —— Laya 与 Jev 都走标准库 urllib / local serve
+# 原生 System One 使用与课程相同的 SDK；通用聊天模型仍用标准 HTTP。
+typesafe-sdk>=0.7,<1

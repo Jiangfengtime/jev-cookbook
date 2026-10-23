@@ -17,8 +17,7 @@ from __future__ import annotations
 import json
 import os
 import time
-import urllib.error
-import urllib.request
+from typesafe_sdk import TypeSafeClient, RetryPolicy, TypeSafeAPIError, TypeSafeError
 from typing import Any
 
 from .base import AdapterError
@@ -143,32 +142,18 @@ class TypesafeAdapter:
         }
 
     def _post(self, url: str, body: dict) -> tuple[int, Any, float]:
-        data = json.dumps(body).encode("utf-8")
-        req = urllib.request.Request(url, data=data, headers=self._headers(), method="POST")
+        # 与教程共用官方 SDK 的请求序列化和传输，兼容嵌套 state 与阿里云响应。
         t0 = time.perf_counter()
         try:
-            with urllib.request.urlopen(req, timeout=self.timeout_s) as resp:
-                status = resp.status
-                payload = resp.read().decode("utf-8", errors="replace")
-                latency = time.perf_counter() - t0
-        except urllib.error.HTTPError as e:
-            status = e.code
-            try:
-                payload = e.read().decode("utf-8", errors="replace")
-            except Exception:
-                payload = ""
-            latency = time.perf_counter() - t0
-            if status in (401, 403, 429):
-                raise AdapterError(
-                    f"http {status}: auth/rate-limited", fatal=True, code=status
-                )
-            raise AdapterError(f"http {status}: {payload[:200]}", code=status) from None
-        except Exception as e:
-            raise AdapterError(f"network: {type(e).__name__}: {e}") from e
-        try:
-            return status, json.loads(payload), latency
-        except json.JSONDecodeError:
-            raise AdapterError(f"non-JSON response: {payload[:200]}") from None
+            with TypeSafeClient(api_key=self.key, base_url=self.base_url, model=self.model,
+                                timeout=self.timeout_s, retry=RetryPolicy(max_retries=0)) as client:
+                response = client.system_one(body["state"], body["questions"])
+            return 200, response.model_dump(), time.perf_counter() - t0
+        except TypeSafeAPIError as error:
+            raise AdapterError(f"http {error.status}: native decision request failed",
+                               fatal=error.status in (401, 403, 429), code=error.status) from None
+        except TypeSafeError as error:
+            raise AdapterError(f"native SDK: {type(error).__name__}") from None
 
     def call(self, task) -> dict:
         body = _build_request(task, self.model)

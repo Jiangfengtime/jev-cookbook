@@ -31,7 +31,7 @@ flowchart TD
 | --- | --- |
 | `src/index.ts` | Cordis 插件配置、两个 DSH 工具的注册、JSON 结果渲染 |
 | `src/contracts.ts` | 请求规范化、资源限制、三类响应校验 |
-| `src/client.ts` | 固定端点 HTTP 调用、取消与超时、异常归一化 |
+| `src/client.ts` | 可配置 System One 服务的 HTTP 调用、取消与超时、异常归一化 |
 | `src/router.ts` | 中文问题模板 `task-router-v1` 与分流规则 |
 | `src/mock.ts` | 明确标注的人工测试数据 |
 | `src/mode.ts` | 向 DSH systemPrompt 注册中文模式提示 |

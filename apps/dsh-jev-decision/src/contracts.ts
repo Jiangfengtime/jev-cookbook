@@ -13,7 +13,7 @@ export type Answer =
 export type ResponseData = {
   model: string;
   answers: Record<string, Answer>;
-  usage: { input_tokens: number; output_tokens: number };
+  usage: { input_tokens: number; output_tokens: number | null };
 };
 export type ErrorCode = 'invalid_request' | 'missing_api_key' | 'authentication' | 'rate_limited'
   | 'server_error' | 'network_error' | 'timeout' | 'aborted' | 'invalid_response';
@@ -159,8 +159,10 @@ export function parseResponse(input: unknown, questions: Questions): ResponseDat
       answers[id] = { type: 'score', score: raw.score, confidence, probabilities, legend };
     }
   }
-  const { input_tokens, output_tokens } = input.usage;
-  if (!Number.isSafeInteger(input_tokens) || !Number.isSafeInteger(output_tokens)
-    || (input_tokens as number) < 0 || (output_tokens as number) < 0) return malformed('API 用量字段无效。');
-  return { model: input.model, answers, usage: { input_tokens: input_tokens as number, output_tokens: output_tokens as number } };
+  const { input_tokens } = input.usage;
+  // 决策模型可能只返回 input_tokens；缺失表示未知，不能伪造为 0。
+  const output_tokens = input.usage.output_tokens ?? null;
+  if (!Number.isSafeInteger(input_tokens) || (output_tokens !== null && !Number.isSafeInteger(output_tokens))
+    || (input_tokens as number) < 0 || (output_tokens !== null && (output_tokens as number) < 0)) return malformed('API 用量字段无效。');
+  return { model: input.model, answers, usage: { input_tokens: input_tokens as number, output_tokens: output_tokens as number | null } };
 }

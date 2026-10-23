@@ -52,7 +52,7 @@ async function readJson(response: Response): Promise<unknown> {
   catch { throw new DecisionError('invalid_response', 'API 返回的内容不是有效 JSON。'); }
 }
 
-/** 固定 TypeSafe 端点；密钥只在发起请求时读取，不进入参数、日志或配置。 */
+/** 从运行环境选择 System One 服务；密钥不进入工具参数、日志或结果。 */
 export class JevClient {
   readonly mode: RunMode;
   readonly model: string;
@@ -102,7 +102,7 @@ export class JevClient {
     const signal = callerSignal ? AbortSignal.any([callerSignal, timeout.signal]) : timeout.signal;
     const start = performance.now();
     try {
-      const response = await fetch(TYPESAFE_ENDPOINT, {
+      const response = await fetch(process.env.TYPESAFE_BASE_URL ? process.env.TYPESAFE_BASE_URL.replace(/\/+$/, '') + '/v1/systemone' : TYPESAFE_ENDPOINT, {
         method: 'POST', redirect: 'error', signal,
         headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ model: this.model, ...request }),

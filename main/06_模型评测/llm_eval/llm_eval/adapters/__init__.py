@@ -109,6 +109,12 @@ PROVIDERS: dict[str, dict[str, Any]] = {
 }
 
 
+# 与教程共用 .env 中配置的原生 System One 服务；显式 endpoint/model 仍可覆盖。
+for _name in ("jev", "typesafe"):
+    PROVIDERS[_name]["base_url"] = os.getenv("TYPESAFE_BASE_URL") or PROVIDERS[_name]["base_url"]
+    PROVIDERS[_name]["default_model"] = os.getenv("TYPESAFE_DEFAULT_MODEL") or PROVIDERS[_name]["default_model"]
+
+
 def get_adapter(
     *,
     name: str,

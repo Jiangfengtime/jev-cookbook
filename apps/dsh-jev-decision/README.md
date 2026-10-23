@@ -169,7 +169,7 @@ node --env-file=.env scripts/check-live.mjs --routes --output reports/live-route
 | `JEV_DECISION_MODE` | `live`；显式 `mock` 才使用人工夹具 |
 | `TYPESAFE_DEFAULT_MODEL` | `jev-1.13.0`，记录请求模型与实际响应模型 |
 | `TYPESAFE_API_KEY` | 仅从环境读取，不是模型可传的工具参数 |
-| 端点 | 固定 `https://api.typesafe.ai/v1/systemone`，不跟随重定向 |
+| `TYPESAFE_BASE_URL` | 默认 `https://api.typesafe.ai`；自定义服务填 API 根地址，客户端追加 `/v1/systemone`，不跟随重定向 |
 | 超时 | 默认 20 秒；可配置 100–120000 毫秒；遵循调用取消信号 |
 | 自动重试 | 无，避免一次工具调用暗中重复请求 |
 | 输入边界 | `state + questions` 默认 64 KiB，最多 16 题；JSON 最多 20 层 |

@@ -8,7 +8,7 @@ naked-single / hidden-single reasoning a careful human applies.  It never touche
 
 With ``--judge jev`` (and ``TYPESAFE_API_KEY`` set) the same requests go to the real API
 through ``typesafe_sdk``, one ``system_one`` call per cell with the 9-way ``choice`` plus
-nine ``boolean`` questions, mirroring the snake request shape.
+nine ``noul`` questions, mirroring the snake request shape.
 
 Run:  .venv/bin/python jev_sudoku.py --episodes 10 --holes 40
 """
@@ -22,7 +22,7 @@ import sys
 import time
 from pathlib import Path
 
-from dotenv import find_dotenv, load_dotenv
+
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
@@ -129,7 +129,7 @@ def run_episode(seed: int, holes: int, judge, split: str = 'dev',
         answer = judge(request)
         digit = int(answer['digit'])
         row, col = request['cell']
-        correct = digit == record['gold']['digit']
+        correct = digit == int(record['gold']['digit'])
         steps.append({
             'cell': [row, col],
             'candidates': request['candidates'],
@@ -155,7 +155,7 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument('--episodes', type=int, default=10)
     parser.add_argument('--holes', type=int, default=40)
-    parser.add_argument('--judge', choices=('local', 'jev'), default='local')
+    parser.add_argument('--judge', choices=('local', 'jev'), default='jev')
     parser.add_argument('--trial-memory', action='store_true',
                         help='remember wrong guesses per cell and publish them back')
     parser.add_argument('--first-seed', type=int, default=1)
@@ -164,7 +164,9 @@ def main() -> int:
     ARTIFACTS.mkdir(parents=True, exist_ok=True)
     judge = None
     if args.judge == 'jev':
-        load_dotenv(find_dotenv(usecwd=True) or Path(__file__).resolve().parents[3] / ".env")
+        sys.path.insert(0, str(HERE.parents[2]))
+        from notebook_runtime import load_project_env
+        load_project_env(HERE.parents[3])
         key = os.environ.get('TYPESAFE_API_KEY')
         if not key:
             print('TYPESAFE_API_KEY 未设置 —— 无法使用真 Jev，退出')

@@ -1,0 +1,1 @@
+{"seed": 42, "holes": 1, "outcome": "win", "score": 1, "mistakes": 0, "steps": 1, "steps_detail": [{"cell": [2, 8], "candidates": [7], "answered": 7, "gold": "7", "correct": true}]}

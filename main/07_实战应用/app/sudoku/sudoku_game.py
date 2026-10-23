@@ -7,7 +7,7 @@ rendered requests that omit solution and seed, exactly as the snake omits RNG st
 
 Episode shape: the harness picks the next empty cell (most-constrained-first, computed
 from published facts), and the judge answers one ``choice`` question — which digit to
-write — plus one ``boolean`` question per digit ("is d consistent with the unique
+write — plus one ``noul`` question per digit ("is d consistent with the unique
 solution?").  A wrong digit counts as a mistake; three mistakes end the episode.  Gold
 labels are computable because the puzzle has a unique solution.
 
@@ -265,30 +265,22 @@ def render_request(state):
         ('   <- next cell (row %d, column %d)' % (row, col) if r == row else '')
         for r in range(9)
     )
-    text = (f"Sudoku 9x9, zero-based (row,column). Dots are empty cells.\n{board}\n"
-            f"The next cell to fill is (row {row}, column {col}). "
-            f"{_constraints_text(state, row, col)[0].upper() + _constraints_text(state, row, col)[1:]}. "
-            "A digit already present in the row, column, or box is impossible. Among the digits "
-            "that survive all three constraints, exactly one matches the puzzle's unique solution; "
-            "the puzzle is solvable by constraint reasoning alone when a cell has a single candidate, "
-            "and by elimination when a digit fits nowhere else in its row, column, or box.")
+    text = (f"9×9 数独，行列索引从 0 开始，点号表示空格。\n{board}\n"
+            f"本次填写第 {row} 行、第 {col} 列。公开约束：{_constraints_text(state, row, col)}。"
+            "行、列、3×3 宫内已经出现的数字不能重复。通过排除得到候选后，"
+            "再结合其他空格推断唯一解；符合局部约束不一定意味着是最终正确答案。")
     questions = {'digit': {'type': 'choice', 'instructions':
-        'Write exactly one digit into the named cell. Use the published row/column/box exclusions '
-        'first: digits listed there are impossible. Among the survivors, prefer a digit that '
-        'appears as a candidate for no other empty cell in its row, column, or box (a hidden '
-        'single). Do not guess between two equally-reasoned survivors.',
+        f'请判断第 {row} 行、第 {col} 列应填写哪个数字。先排除同行、同列、同宫已出现的数字；'
+        '若候选仅一个则选择它，否则结合整盘判断某数字是否只能放在此格。',
         'criteria': {str(d): (
-            f'Write {d} at (row {row}, column {col}). '
-            + ('IMPOSSIBLE: it already appears in ' + _conflict_unit(state, row, col, d) + '.'
+            f'在第 {row} 行、第 {col} 列填入 {d}。'
+            + ('不可能：已出现在 ' + _conflict_unit(state, row, col, d) + '。'
                if d in _peers(state['grid'], row, col) else
-               'survives all three row/column/box checks.')) for d in DIGITS}}}
+               '通过行、列、宫三类排除约束，需要进一步判断是否符合唯一解。')) for d in DIGITS}}}
     for d in DIGITS:
-        questions[f'fits_{d}'] = {'type': 'boolean', 'instructions':
-            f'If the cell (row {row}, column {col}) is filled with {d}, is that the digit the '
-            'puzzle\'s unique solution places there? Constraint survival is necessary but not '
-            'sufficient.',
-            'criteria': {'true': f'{d} is the solution digit for this cell.',
-                         'false': f'The solution digit for this cell is not {d}.'}}
+        questions[f'fits_{d}'] = {'type': 'noul', 'instructions':
+            f'第 {row} 行、第 {col} 列的唯一解数字是否为 {d}？'
+            '只符合行、列、宫的局部排除约束并不充分，请结合棋盘推断。'}
     return {'state': text, 'questions': questions, 'cell': [row, col], 'candidates': cands}
 
 

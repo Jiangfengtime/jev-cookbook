@@ -56,6 +56,9 @@ SERVICES = [
     ("blackjack", "21 点对局", 8802, "/",
      "基本策略 gold vs 凭直觉打法的资金曲线对照——长期必输的游戏里衡量策略差距",
      "app/blackjack/EXPERIMENT.md"),
+    ("sudoku-live", "数独 · Jev 实时解题台", 8803, "/",
+     "切换 case，运行/暂停或单步判断；完整查看并一键复制真实 Jev 请求与响应",
+     "app/sudoku/EXPERIMENT.md"),
 ]
 # 回放实验：无端口，由菜单服务器托管 final.html（本地录制回放，不调 API）
 REPLAYS = [
@@ -72,9 +75,9 @@ REPLAYS = [
 
 # 可一键运行的实验（slug → 标题 / bash 命令 / 说明 / 报告路径）
 RUNNABLES = {
-    "sudoku": ("数独评测（本地裁判解 10 局，40 洞）",
-               "cd app/sudoku && \"$PY\" jev_sudoku.py --episodes 10 --holes 40",
-               "MRV 选格 + 约束推理裁判；加 --judge jev 可切真 Jev",
+    "sudoku": ("数独评测（真实 Jev 解 1 局，12 空格）",
+               "cd app/sudoku && \"$PY\" jev_sudoku.py --judge jev --episodes 1 --holes 12 --trial-memory",
+               "使用 main/.env 的真实模型；可视化解题请选择上方数独实时解题台",
                "app/sudoku/EXPERIMENT.md"),
     "maze-tests": ("迷宫测试套件（3 模块）",
                "cd app/maze/scripts && \"$PY\" -m pytest test_unified_grid_envs.py test_scaled_maze.py test_composed_maze.py -q",
@@ -124,6 +127,8 @@ def start_all() -> None:
                      HERE / "app/doudizhu"),
         "blackjack": ([sys.executable, "serve_blackjack.py", "--port", "8802", "--judge", "local"],
                       HERE / "app/blackjack"),
+        "sudoku-live": ([sys.executable, "serve_sudoku.py", "--port", "8803", "--no-open"],
+                        HERE / "app/sudoku"),
         "web-lab": ([sys.executable, "-m", "http.server", "4180", "--bind", "127.0.0.1"],
                     HERE / "app/jev-games/apps/web/dist"),
     }
@@ -139,7 +144,7 @@ def stop_all() -> None:
     """按端点精确停掉本章服务（不动其他进程）。"""
     killed = 0
     try:
-        out = subprocess.run(["lsof", "-tiTCP:4173,4174,4175,4180,4200,8801,8802,8812,8766",
+        out = subprocess.run(["lsof", "-tiTCP:4173,4174,4175,4180,4200,8801,8802,8803,8812,8766",
                               "-sTCP:LISTEN"], capture_output=True, text=True).stdout
         pids = {p for p in out.split() if p}
         for pid in pids:
@@ -260,7 +265,7 @@ code{{background:#1b2337;padding:2px 6px;border-radius:6px;color:#7dd3fc;font-si
 <div class="grid">{''.join(rows)}</div>
 <h2>一键运行实验（点击即跑，输出就地显示）</h2>
 <table>{cli}</table>
-<p class="foot">密钥从 main/07_实战应用/.env 读取（已 gitignore）· 八节报告见各卡片「实验报告」 · 状态每 15s 自动刷新
+<p class="foot">数独配置优先读取 main/.env，其他应用见各自说明（密钥不入库）· 八节报告见各卡片「实验报告」 · 状态每 15s 自动刷新
 <meta http-equiv="refresh" content="15"></p>"""
 
 

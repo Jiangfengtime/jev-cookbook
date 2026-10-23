@@ -4,12 +4,12 @@
 
 ```bash
 cd main/07_实战应用
-python3 start.py        # 拉起全部 7 个服务 + 打开总控菜单（:4200）
+python3 start.py        # 拉起全部 8 个服务 + 打开总控菜单（:4200）
 python3 start.py stop   # 全部停止
 python3 start.py status # 只看状态
 ```
 
-总控菜单包含：**7 个实况服务卡**（贪吃蛇/扫雷/狼人杀/智能家居/Games Lab/斗地主/21 点，带 :端口）+ **3 张回放卡**（迷宫/移动靶/浏览器 final.html，本地录制不调 API，随时可看）+ **Mario 实况卡**（:8770，自动探测上游 venv，缺失时降级为报告卡）+ **5 个一键运行实验**（数独/迷宫测试/移动靶测试/守卫回归/live smoke——点击即跑、输出就地显示，可重跑）。密钥从本目录 `.env` 读取（已 gitignore）。
+总控菜单包含：**8 个实况服务卡**（贪吃蛇/扫雷/狼人杀/智能家居/Games Lab/斗地主/21 点/数独，带 :端口）+ **3 张回放卡**（迷宫/移动靶/浏览器 final.html，本地录制不调 API，随时可看）+ **Mario 实况卡**（:8770，自动探测上游 venv，缺失时降级为报告卡）+ **5 个一键运行实验**（数独/迷宫测试/移动靶测试/守卫回归/live smoke——点击即跑、输出就地显示，可重跑）。密钥从本目录 `.env` 读取（已 gitignore）。
 
 > 以 [jev-playground](https://github.com/Bald0Wang/jev-playground) 的实验规范为准（完整操作规范见 [`AGENT.md`](AGENT.md)）：每个项目一份 **EXPERIMENT.md 八节报告**（这是什么 / 实验意义 / 要回答的问题 / 实验怎么做的 / Jev 每一步怎么工作 / 实验结果与说明 / 成本与耗时 / 结论与后续），运行截图存 `figures/`，**数据必须实测**、人工数据必须标注。
 
@@ -38,7 +38,7 @@ python3 start.py status # 只看状态
 | [browser-use](app/browser-use/) | `python scripts/check_guards.py` + `scripts/smoke.py` | 21 项守卫 + 真 Jev 端到端（verified: true） | [EXPERIMENT.md](app/browser-use/EXPERIMENT.md) |
 | [doudizhu](app/doudizhu/) | `python3 serve_doudizhu.py` | 见其 EXPERIMENT.md（playground 原报告） | ✓ |
 | [blackjack](app/blackjack/) | `python3 serve_blackjack.py` | 同上 | ✓ |
-| [sudoku](app/sudoku/) | `python3 jev_sudoku.py --episodes 10` | 同上 | ✓ |
+| [sudoku](app/sudoku/) | `python serve_sudoku.py --port 8803` | 真实 Jev、case 切换、暂停、报文与复制；8 项回归通过 | [EXPERIMENT.md](app/sudoku/EXPERIMENT.md) |
 | [mario 复现](app/typesafe-mario-repro/) | 见其 README | 同上 | ✓ |
 | [smart-home](app/smart-home/) | `python3 serve_smart_home.py` | 见其 EXPERIMENT.md | ✓ |
 
@@ -60,3 +60,14 @@ python3 start.py status # 只看状态
 - browser-use 的 TYPE_TEXT 需要 `TEXT_MODEL_API_KEY`（判断与文本生成分离是硬约束）；
 - werewolf 无 `DEEPSEEK_API_KEY` 时发言走模板（显式标注 template_fallback），判断仍由 Jev 完成；
 - jev-games 端口约定：4173/4174/4175，被占自动 +1。
+
+## 数独实时解题台复查（2026-10-24）
+
+配置从 `main/.env` 读取（文件优先），使用仓库 `main/.venv/bin/python` 启动 `app/sudoku/serve_sudoku.py`，默认端口 8803。真实 Jev 完成 12 空格入门整局（12/12、零失误），标准/挑战各验证前三步；实际在途 HTTP 200 响应在暂停后没有落子。浏览器验证 case 切换、自定义 seed 及三个完整报文复制按钮。回归命令：
+
+```bash
+# 仓库根目录
+main/.venv/bin/python -m unittest discover -s main/07_实战应用/app/sudoku -p 'test_live_sudoku.py' -v
+```
+
+详见数独报告；部分题目只验证前三步，不作为完整胜率评测。

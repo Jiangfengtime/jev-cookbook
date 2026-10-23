@@ -1,62 +1,39 @@
-# 数独 — Jev 解题台
+# 数独 · Jev 实时解题台
 
-让一个判定模型（Jev / 本地约束推理替身）一步步解数独，参照
-[NanoJev](https://github.com/TianyuCodings/NanoJev) 的 `snake_game.py` 模式构建：
-确定性生成（SplitMix64 种子流）、完整可验证的 JSON 状态、`render_request` 渲染问题、
-程序化 gold 标签（唯一解可计算）。
+页面逐步调用 `main/.env` 配置的真实 Jev 模型，不读取预制回合，也不会在请求失败后切换为替身。
 
-## 快速开始
+## 启动
 
-```bash
-# 评测：本地裁判解 N 个谜题（零依赖，纯标准库）
-python3 jev_sudoku.py --episodes 10 --holes 40
-
-# 接真实 Jev
-pip install typesafe-sdk
-export TYPESAFE_API_KEY=你的key     # console.typesafe.ai 获取
-python3 jev_sudoku.py --judge jev --episodes 10
-```
-
-## 玩法与决策
-
-- `make_sudoku(seed, holes)` 生成唯一解谜题（默认 40 空格，可加到 55+ 提升难度）
-- harness 用 **MRV**（约束最多的空格优先）选出下一格，judge 回答一个 `choice`：填 1–9 哪个数字
-- 每个数字的 criterion 带本格约束事实：`row 0 已含 [1,2,3,5,6,7,8]；column 7 已含 [3,5,9]…`
-- 另有 9 个 `boolean` 问题：`d 填这里是否与唯一解一致`（gold 可程序化判定）
-- 填错记 mistake，3 错终局；填满即胜
-- 模型看到的棋盘**不含 solution 与种子**——与贪吃蛇省略 RNG 状态同一约定
-
-## 可视化回放
-
-打开 [sudoku_replay.html](sudoku_replay.html) 可逐步查看一条 seed 1 的离线回合记录：棋盘标出题目给定、已填格与当前待判断格，侧栏展示当前候选以及行、列、宫约束。页面不调用 API；图中的答案与步数来自 `artifacts/sudoku/sudoku_local_40h_10ep.jsonl`。这条单局记录用于解释过程，不替代 `EXPERIMENT.md` 中的难度与消融对照。
-
-![数独离线回放：棋盘状态与行列宫约束面板](images/showcase-replay.png)
-
-## 难度旋钮与试错记忆（本地裁判：naked/hidden single，绝不看 solution）
+从仓库根目录执行：
 
 ```bash
-python3 jev_sudoku.py --episodes 10 --holes 40                    # 10/10 全胜
-python3 jev_sudoku.py --episodes 10 --holes 55                    # 无记忆：2/10
-python3 jev_sudoku.py --episodes 10 --holes 55 --trial-memory     # 加试错记忆：5/10
+main/.venv/bin/python main/07_实战应用/app/sudoku/serve_sudoku.py --port 8803
 ```
 
-试错记忆：猜错的数字会被记住并在下一拍发布回请求（「此格已证错：1, 2」），
-裁判不再重复同一个错答案。对 50–55 空格提升显著（约束裁判 55 洞 0/10 → 5/10），
-机制与数据见 EXPERIMENT.md。
+打开 <http://127.0.0.1:8803>。也可以从第七章 `start.py` 总控菜单打开「数独 · Jev 实时解题台」。直接双击 HTML 或通过普通静态文件服务器打开，不能调用后端。
 
-40 洞的谜题在 MRV + 排除事实下必然产生 naked single；55 洞需要真正的搜索。
-这正是有意义的评测区间——换真 Jev 上来，同样的差距就是模型推理能力的度量。
+模型配置统一读取 `main/.env`：`TYPESAFE_API_KEY`、`TYPESAFE_BASE_URL`、`TYPESAFE_DEFAULT_MODEL`。明确写在文件中的值优先于旧进程环境；修改后重启数独服务。密钥不进入浏览器或 Git。
 
-## 产物
+## 操作
 
-`artifacts/`：每局 JSONL（逐步的候选、回答、gold、对错）+ 汇总 JSON（胜率、平均得分、错误数）。
+1. **切换 case**：入门（12 空格）、标准（40 空格）、挑战（55 空格）；也支持自定义 seed 与 1–55 个空格。切换后清空当前页面的历史并默认暂停，旧题停止落子。
+2. **运行 / 暂停**：连续调用 Jev，暂停后停止后续调用。在途 HTTP 请求不能撤销，但响应只留作查看，不再改变棋盘。也可以「单步判断」或「重新开局」。
+3. **完整报文**：查看本局每次调用的实际 HTTP URL、请求头、完整 JSON 正文、响应状态码、响应头和完整响应正文。保留服务端额外字段；只有鉴权密钥及 Cookie 隐藏。正文为解码后的文本，可滚动查看，不截断。
+4. **一键复制**：分别复制完整请求、完整响应，或将两者一起复制；历史下拉可切换到任一步。
 
-## 实验报告
+代码用 MRV 选择空格，模型通过一个 `Choice` 与九个 `Noul` 问题判断数字。代码只做规则校验，不代替模型选数；唯一解、seed 和 gold 不发送给 Jev。答错不落盘，并将试错信息带入下一次请求；三次失误终止。网络或响应格式异常自动暂停，不使用离线数据填数。
 
-完整实验（意义 / 问题 / 过程 / 结果）见 [EXPERIMENT.md](EXPERIMENT.md)，
-可复现脚本 `experiment.py`，数据在 `artifacts/`。
+![Jev 实时数独、题目切换与完整报文面板](figures/live-sudoku.png)
 
-## 文件
+## 命令行与测试
 
-- `sudoku_game.py` — 引擎：生成/校验/step/请求渲染/gold（对齐 snake_game.py 的函数签名）
-- `jev_sudoku.py` — 评测 runner（本地裁判 / 真 Jev）
+```bash
+# 默认使用真实 Jev；与页面使用同一份模型配置
+main/.venv/bin/python main/07_实战应用/app/sudoku/jev_sudoku.py --episodes 1 --holes 12 --trial-memory
+# 并发、暂停、切题、失败处理与 HTTP 报文契约回归（不消耗真实 API）
+main/.venv/bin/python -m unittest discover -s main/07_实战应用/app/sudoku -p 'test_live_sudoku.py' -v
+```
+
+`--judge local` 仅保留为显式选择的历史基线，网页没有此模式。[历史本地裁判实验](EXPERIMENT_LOCAL_BASELINE.md)和原始 `artifacts/` 数据不作为真实模型结果。
+
+[当前八节报告](EXPERIMENT.md) · [2026-10-24 实测记录](artifacts/live_validation_20261024.json)

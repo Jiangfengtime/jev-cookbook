@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-24",
+  "model": "decision-model-preview",
+  "mock_fallback": false,
+  "cases": [
+    {
+      "case_id": "warmup",
+      "seed": 1,
+      "holes": 12,
+      "requests": 12,
+      "score": 12,
+      "mistakes": 0,
+      "done": true,
+      "outcome": "win",
+      "input_tokens": 13154,
+      "latency_ms": [
+        255.4,
+        215.3,
+        300.4,
+        218.7,
+        297.4,
+        226.2,
+        317.2,
+        228.0,
+        249.8,
+        215.1,
+        290.4,
+        239.9
+      ]
+    },
+    {
+      "case_id": "standard",
+      "seed": 7,
+      "holes": 40,
+      "requests": 3,
+      "score": 3,
+      "mistakes": 0,
+      "done": false,
+      "outcome": null,
+      "input_tokens": 3118,
+      "latency_ms": [
+        213.9,
+        214.7,
+        268.9
+      ]
+    },
+    {
+      "case_id": "challenge",
+      "seed": 11,
+      "holes": 55,
+      "requests": 3,
+      "score": 3,
+      "mistakes": 0,
+      "done": false,
+      "outcome": null,
+      "input_tokens": 3064,
+      "latency_ms": [
+        284.3,
+        5133.9,
+        246.2
+      ]
+    }
+  ],
+  "pause_inflight": {
+    "requests": 1,
+    "applied": false,
+    "http_status": 200
+  },
+  "unit_tests": 8,
+  "sdk_version": "0.7.5"
+}

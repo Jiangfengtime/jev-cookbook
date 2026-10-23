@@ -132,10 +132,10 @@
 
 **看点：** 先由 MRV（最少候选优先）选格，再结合同行、同列、同宫排除数字。时间轴可以逐步回放本地裁判记录；右侧展示的是候选约束和本步记录答案，不把候选概率冒充成“答对概率”。
 
-![数独逐步回放：9×9 棋盘、当前候选、行列宫约束](app/sudoku/images/showcase-replay.png)
+![数独实时 Jev 解题台：棋盘、题目切换与完整报文](app/sudoku/figures/live-sudoku.png)
 
-- [交互回放页](app/sudoku/sudoku_replay.html) · [项目代码与说明](app/sudoku/) · [实验报告](app/sudoku/EXPERIMENT.md)
-- **边界：** 截图对应一个 seed 的离线样例。难度曲线与消融对照应看实验报告，不能从单局推出泛化结论。
+- [实时解题台（启动服务后打开）](http://127.0.0.1:8803) · [项目代码与说明](app/sudoku/) · [实验报告](app/sudoku/EXPERIMENT.md)
+- **操作：** 运行 `app/sudoku/serve_sudoku.py`；支持 case 切换、运行/暂停、单步与完整请求/响应复制。真实 Jev 不回退到本地替身；历史基线数据另存，单局结果不能推出泛化结论。
 
 ### 11. Mario 复现：模拟器闭环
 
@@ -159,7 +159,7 @@
 
 本章项目混合了静态回放、离线裁判、UI 模拟和可选在线 API：
 
-- **零密钥阅读：** 先读各项目 README 与实验报告，并打开 maze/final.html、predict_position/final.html、browser-use/final.html 和 sudoku/sudoku_replay.html 查看本地回放。数独回放直接展示离线记录；移动靶在缺少逐帧原图时明确切换到场景示意。
+- **零密钥阅读：** 先读各项目 README 与实验报告，并打开 maze/final.html、predict_position/final.html和 browser-use/final.html 查看本地回放。数独现为真实 Jev 服务，需配置密钥并启动后端；移动靶在缺少逐帧原图时明确切换到场景示意。
 - **需要运行服务时：** 按具体项目 README 和[统一测试指南](TESTING.md)启动单个项目。不要把启动了网页等同于已经完成在线模型验证。
 - **需要在线 API 时：** 先检查项目说明中的模型、密钥和成本要求；不要把密钥写入代码或截图。智能家居和浏览器 smoke 的在线路径可能触发真实请求。
 - **看实验结果时：** 区分样例回放、离线规则裁判、mock、模板 fallback 与真实模型响应；成功判定应以项目裁判和冻结测试集指标为准。
